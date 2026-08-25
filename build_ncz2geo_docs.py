@@ -54,7 +54,7 @@ window.MathJax = {
   --fg-heading: #ffffff;
   --muted: #9ca3af;
   --dim: #6b7280;
-  
+
   --accent: #3b82f6;
   --accent-dark: #2563eb;
   --accent-light: rgba(59, 130, 246, 0.12);
@@ -62,16 +62,16 @@ window.MathJax = {
   --accent-emerald: #10b981;
   --accent-amber: #f59e0b;
   --accent-rose: #f43f5e;
-  
+
   --border: #1f2937;
   --border-subtle: #374151;
   --code-bg: #0d1117;
   --sidebar-active: rgba(59, 130, 246, 0.15);
   --table-stripe: #141d2e;
-  
+
   --gradient-brand: linear-gradient(135deg, #3b82f6 0%, #06b6d4 50%, #10b981 100%);
   --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
-  
+
   font-size: 14.5px;
   line-height: 1.68;
 }
@@ -84,11 +84,11 @@ window.MathJax = {
   --fg-heading: #0f172a;
   --muted: #475569;
   --dim: #64748b;
-  
+
   --accent: #2563eb;
   --accent-dark: #1d4ed8;
   --accent-light: #dbeafe;
-  
+
   --border: #e2e8f0;
   --border-subtle: #cbd5e1;
   --code-bg: #0f172a;
@@ -661,7 +661,7 @@ tr:nth-child(even) td {
     <div class="sandbox-badge"><i data-lucide="palette" style="width:12px;height:12px;margin-right:4px;"></i> Live PlanGML & e-Plan Inspector Sandbox</div>
     <h3 style="margin-top:0;">PlanGML Layer Classifier & e-Plan Symbology Simulator</h3>
     <p style="font-size:0.88rem;color:var(--muted);">Select a Turkish spatial plan type and type a Netcad layer name to test real-time PlanGML identity resolution and official e-Plan color/hatching extraction:</p>
-    
+
     <div class="sandbox-grid">
       <div>
         <div class="control-item">
@@ -881,7 +881,7 @@ const search = document.getElementById("search");
 search.addEventListener("input", function(e) {
   const q = e.target.value.toLowerCase().trim();
   const algLinks = document.querySelectorAll(".toc-algs li a");
-  
+
   algLinks.forEach(link => {
     const text = (link.getAttribute("data-display") || link.innerText).toLowerCase();
     const li = link.closest("li");
@@ -925,7 +925,7 @@ const opacityEl = document.getElementById("opacityEl");
 function updatePlanGml() {
   const ptype = planTypeSelect.value;
   const rawKey = layerNameInput.value.trim().toUpperCase();
-  
+
   let match = catalogData[rawKey];
   if (!match) {
     for (const k in catalogData) {
@@ -935,11 +935,11 @@ function updatePlanGml() {
       }
     }
   }
-  
+
   if (!match) {
     match = { name: "Diğer İmar Fonksiyonu", code: 9999, group: "Genel Planlama Alanı", hex: "#888888", opacity: 0.5 };
   }
-  
+
   swatchEl.style.backgroundColor = match.hex;
   funcNameEl.innerText = match.name;
   funcCodeEl.innerText = `PlanGML Kod: ${match.code} (${ptype})`;
