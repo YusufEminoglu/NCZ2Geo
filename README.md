@@ -1,6 +1,10 @@
-# NCZ2Geo
-
 <div align="center">
+
+<a href="https://yusufeminoglu.github.io/NCZ2Geo/">
+  <img src="https://raw.githubusercontent.com/YusufEminoglu/NCZ2Geo/main/docs/icons/logo.svg" width="140" height="140" alt="NCZ2Geo logo" />
+</a>
+
+# NCZ2Geo
 
 [![CI](https://github.com/YusufEminoglu/NCZ2Geo/actions/workflows/ci.yml/badge.svg)](https://github.com/YusufEminoglu/NCZ2Geo/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/NCZ2Geo.svg?color=3b82f6)](https://pypi.org/project/NCZ2Geo/)
