@@ -1,0 +1,7 @@
+include README.md
+include CHANGELOG.md
+include LICENSE
+include THIRD_PARTY_NOTICES.md
+recursive-include src/netcad2plangml *.py
+recursive-include src/netcad2plangml py.typed
+recursive-include tests *.py

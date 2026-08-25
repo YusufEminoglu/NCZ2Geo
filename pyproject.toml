@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "netcad2plangml"
+version = "0.1.0"
+authors = [
+    { name = "Yusuf Eminoğlu", email = "yusufeminoglu@gmail.com" }
+]
+description = "Pure-Python Netcad NCZ/NCA reader with PlanGML identity and e-Plan symbology metadata."
+readme = "README.md"
+license = "GPL-2.0-or-later"
+requires-python = ">=3.9"
+keywords = [
+    "netcad",
+    "ncz",
+    "nca",
+    "plangml",
+    "eplan",
+    "mpyy",
+    "geojson",
+    "gis",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Intended Audience :: Developers",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "build>=1.0.0",
+    "twine>=5.0.0",
+]
+
+[project.scripts]
+netcad2plangml = "netcad2plangml.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/YusufEminoglu/netcad2plangml"
+Repository = "https://github.com/YusufEminoglu/netcad2plangml"
+Issues = "https://github.com/YusufEminoglu/netcad2plangml/issues"
+Changelog = "https://github.com/YusufEminoglu/netcad2plangml/blob/main/CHANGELOG.md"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+netcad2plangml = ["py.typed"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+exclude = [
+    ".venv",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "C4"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.coverage.run]
+source = ["netcad2plangml"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 70
