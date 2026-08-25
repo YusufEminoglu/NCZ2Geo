@@ -6,4 +6,4 @@
 - Added MPYY PlanGML layer identity matching.
 - Added e-Plan symbology metadata matching for UIP/NIP/CDP.
 - Added PlanGML-aware GeoJSON export.
-- Added `netcad2plangml inspect` and `netcad2plangml convert` CLI commands.
+- Added `ncz2geo inspect` and `ncz2geo convert` CLI commands.

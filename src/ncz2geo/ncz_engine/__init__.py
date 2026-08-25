@@ -1,4 +1,4 @@
-"""Netcad NCZ/NCA decoding primitives used by netcad2plangml."""
+"""Netcad NCZ/NCA decoding primitives used by NCZ2Geo."""
 
 from .model import (
     NetcadAttributeRow,

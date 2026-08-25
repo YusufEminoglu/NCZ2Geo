@@ -1,4 +1,4 @@
-"""High-level Netcad readers for netcad2plangml."""
+"""High-level Netcad readers for NCZ2Geo."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from .ncz_engine.v2 import cache as ncz_cache
 from .ncz_engine.v2.parser import parse_file
 
 
-class Netcad2PlanGmlError(RuntimeError):
+class NCZ2GeoError(RuntimeError):
     """Raised when a Netcad source cannot be read or classified."""
 
 

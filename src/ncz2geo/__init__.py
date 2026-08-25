@@ -1,4 +1,4 @@
-"""Netcad NCZ/NCA reader with PlanGML and e-Plan style metadata."""
+"""NCZ2Geo: Netcad NCZ/NCA reader with PlanGML and e-Plan style metadata."""
 
 from .geojson import entities_to_feature_collection, write_geojson
 from .plangml import (

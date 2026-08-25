@@ -1,6 +1,6 @@
-# netcad2plangml
+# NCZ2Geo
 
-`netcad2plangml` is a focused Python SDK for Netcad planning drawings.
+`NCZ2Geo` is a focused Python SDK for Netcad planning drawings.
 It reads Netcad `NCZ`/`NCA` files with the NCZ Engine v2 reader, resolves
 PlanGML/MPYY layer identity, and attaches e-Plan symbology metadata to GeoJSON
 features.
@@ -11,13 +11,13 @@ files and planning symbology workflows.
 ## Install
 
 ```bash
-pip install netcad2plangml
+pip install NCZ2Geo
 ```
 
 ## Python API
 
 ```python
-from netcad2plangml import classify_layer, parse_netcad, write_geojson
+from ncz2geo import classify_layer, parse_netcad, write_geojson
 
 result = parse_netcad("imar_plani.ncz")
 classification = classify_layer("PL_GELISME_KONUT", plan_type="UIP")
@@ -50,25 +50,25 @@ metadata such as:
 Inspect a Netcad file and show PlanGML matches:
 
 ```bash
-netcad2plangml inspect imar_plani.ncz --plan-type UIP
+ncz2geo inspect imar_plani.ncz --plan-type UIP
 ```
 
 Machine-readable inspection:
 
 ```bash
-netcad2plangml inspect imar_plani.ncz --plan-type UIP --json
+ncz2geo inspect imar_plani.ncz --plan-type UIP --json
 ```
 
 Convert every supported geometry to styled GeoJSON:
 
 ```bash
-netcad2plangml convert imar_plani.ncz imar_plani.geojson --plan-type UIP
+ncz2geo convert imar_plani.ncz imar_plani.geojson --plan-type UIP
 ```
 
 Convert selected Netcad layer codes:
 
 ```bash
-netcad2plangml convert imar_plani.ncz konut.geojson --layers 1,4 --plan-type UIP
+ncz2geo convert imar_plani.ncz konut.geojson --layers 1,4 --plan-type UIP
 ```
 
 ## Scope
@@ -77,7 +77,7 @@ The SDK assigns portable PlanGML identity and e-Plan style metadata. It does not
 create QGIS renderer objects or validate a full PlanGML XML package. Renderer
 implementations can consume the emitted properties.
 
-The NCZ reader path is V2-only. V1/legacy third-party parser code is not bundled.
+The NCZ reader path is V2-only. Legacy third-party parser code is not bundled.
 
 ## Development
 

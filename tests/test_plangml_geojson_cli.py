@@ -10,16 +10,16 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from netcad2plangml import classify_layer, parse_netcad
-from netcad2plangml.cli import main
-from netcad2plangml.geojson import entities_to_feature_collection, write_geojson
+from ncz2geo import classify_layer, parse_netcad
+from ncz2geo.cli import main
+from ncz2geo.geojson import entities_to_feature_collection, write_geojson
 from tests import ncz_fixtures as fx
 
 
 class TestPlanGmlGeoJsonAndCli(unittest.TestCase):
     def setUp(self) -> None:
         self.tmp = Path(
-            tempfile.mkdtemp(prefix="netcad2plangml-", dir=Path(__file__).resolve().parent)
+            tempfile.mkdtemp(prefix="ncz2geo-", dir=Path(__file__).resolve().parent)
         )
         self.addCleanup(lambda: _rmtree(self.tmp))
         self.source = self.tmp / "fixture.ncz"

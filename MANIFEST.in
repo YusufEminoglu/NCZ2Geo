@@ -2,6 +2,6 @@ include README.md
 include CHANGELOG.md
 include LICENSE
 include THIRD_PARTY_NOTICES.md
-recursive-include src/netcad2plangml *.py
-recursive-include src/netcad2plangml py.typed
+recursive-include src/ncz2geo *.py
+recursive-include src/ncz2geo py.typed
 recursive-include tests *.py

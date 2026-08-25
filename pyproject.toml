@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "netcad2plangml"
+name = "NCZ2Geo"
 version = "0.1.0"
 authors = [
     { name = "Yusuf Eminoğlu", email = "yusufeminoglu@gmail.com" }
@@ -48,13 +48,13 @@ dev = [
 ]
 
 [project.scripts]
-netcad2plangml = "netcad2plangml.cli:main"
+ncz2geo = "ncz2geo.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/YusufEminoglu/netcad2plangml"
-Repository = "https://github.com/YusufEminoglu/netcad2plangml"
-Issues = "https://github.com/YusufEminoglu/netcad2plangml/issues"
-Changelog = "https://github.com/YusufEminoglu/netcad2plangml/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/YusufEminoglu/NCZ2Geo"
+Repository = "https://github.com/YusufEminoglu/NCZ2Geo"
+Issues = "https://github.com/YusufEminoglu/NCZ2Geo/issues"
+Changelog = "https://github.com/YusufEminoglu/NCZ2Geo/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -63,7 +63,7 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-netcad2plangml = ["py.typed"]
+ncz2geo = ["py.typed"]
 
 [tool.ruff]
 line-length = 100
@@ -83,7 +83,7 @@ testpaths = ["tests"]
 pythonpath = ["src"]
 
 [tool.coverage.run]
-source = ["netcad2plangml"]
+source = ["ncz2geo"]
 branch = true
 
 [tool.coverage.report]

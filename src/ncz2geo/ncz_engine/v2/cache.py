@@ -27,14 +27,14 @@ from .blocks import DrawingMetadata
 # a stored catalog inconsistent with a fresh decode.
 CACHE_VERSION = 2
 
-_DISABLE_ENV = "NETCAD2PLANGML_NCZ_CACHE_DISABLE"
+_DISABLE_ENV = "NCZ2GEO_NCZ_CACHE_DISABLE"
 
 
 def _cache_root() -> Path:
     base = (os.environ.get("LOCALAPPDATA")
             or os.environ.get("XDG_CACHE_HOME")
             or os.path.join(os.path.expanduser("~"), ".cache"))
-    return Path(base) / "netcad2plangml" / "ncz_index"
+    return Path(base) / "ncz2geo" / "ncz_index"
 
 
 def _is_disabled() -> bool:

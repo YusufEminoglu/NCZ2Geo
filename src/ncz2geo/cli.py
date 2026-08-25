@@ -1,4 +1,4 @@
-"""Command-line interface for netcad2plangml."""
+"""Command-line interface for NCZ2Geo."""
 
 from __future__ import annotations
 
@@ -15,10 +15,10 @@ from .reader import NetcadReader, parse_netcad
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="netcad2plangml",
+        prog="ncz2geo",
         description="Inspect Netcad NCZ/NCA files and export PlanGML-aware GeoJSON.",
     )
-    parser.add_argument("--version", action="version", version=f"netcad2plangml {__version__}")
+    parser.add_argument("--version", action="version", version=f"NCZ2Geo {__version__}")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     inspect_parser = subparsers.add_parser("inspect", help="List NCZ/NCA layers and PlanGML matches.")

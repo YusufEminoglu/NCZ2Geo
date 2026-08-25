@@ -11,9 +11,9 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from netcad2plangml import NetcadReader, inspect_source, parse_netcad
-from netcad2plangml.ncz_engine.v2 import cache as ncz_cache
-from netcad2plangml.ncz_engine.v2.parser import parse_bytes
+from ncz2geo import NetcadReader, inspect_source, parse_netcad
+from ncz2geo.ncz_engine.v2 import cache as ncz_cache
+from ncz2geo.ncz_engine.v2.parser import parse_bytes
 from tests import ncz_fixtures as fx
 
 
@@ -62,14 +62,14 @@ class TestReader(unittest.TestCase):
 
     def test_index_cache_can_be_disabled_by_package_env(self) -> None:
         cache_dir = Path(
-            tempfile.mkdtemp(prefix="netcad2plangml-cache-", dir=Path(__file__).resolve().parent)
+            tempfile.mkdtemp(prefix="ncz2geo-cache-", dir=Path(__file__).resolve().parent)
         )
         self.addCleanup(lambda: _rmtree(cache_dir))
         with mock.patch.object(ncz_cache, "_cache_root", return_value=cache_dir):
             path = self._write(fx.full_drawing())
             NetcadReader(path).index()
             self.assertGreaterEqual(ncz_cache.clear(), 1)
-            with mock.patch.dict(os.environ, {"NETCAD2PLANGML_NCZ_CACHE_DISABLE": "1"}):
+            with mock.patch.dict(os.environ, {"NCZ2GEO_NCZ_CACHE_DISABLE": "1"}):
                 NetcadReader(path).index()
                 again = NetcadReader(path).index()
                 self.assertFalse(again.from_cache)
