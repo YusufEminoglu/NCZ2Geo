@@ -29,5 +29,5 @@
 
   <!-- Badge -->
   <rect x="156" y="405" width="200" height="42" rx="21" fill="#0f172a" stroke="url(#glow)" stroke-width="3"/>
-  <text x="256" y="432" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="17" font-weight="800" fill="#fbbf24" text-anchor="middle" letter-spacing="1.5">PLANGML &middot; E-PLAN</text>
+  <text x="256" y="432" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-size="17" font-weight="800" fill="#fbbf24" text-anchor="middle" letter-spacing="1.5">PLANGML &#183; E-PLAN</text>
 </svg>
