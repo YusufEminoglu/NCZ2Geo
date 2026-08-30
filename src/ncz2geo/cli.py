@@ -34,6 +34,18 @@ def build_parser() -> argparse.ArgumentParser:
         "--layers",
         help="Comma-separated layer codes to decode; defaults to all layers.",
     )
+
+    val_parser = subparsers.add_parser("validate", help="Validate PlanGML and e-Plan compliance.")
+    val_parser.add_argument("source", type=Path)
+    val_parser.add_argument("--plan-type", choices=("UIP", "NIP", "CDP"))
+    val_parser.add_argument("--json", action="store_true", help="Output validation report as JSON.")
+    val_parser.add_argument("--markdown", action="store_true", help="Output validation report as Markdown.")
+
+    style_parser = subparsers.add_parser("style", help="Generate OGC SLD, QGIS QML, or Mapbox GL styles.")
+    style_parser.add_argument("source", type=Path)
+    style_parser.add_argument("--format", choices=("sld", "qml", "mapbox", "all"), default="all")
+    style_parser.add_argument("--out-dir", type=Path, default=Path("."))
+    style_parser.add_argument("--plan-type", default="UIP", choices=("UIP", "NIP", "CDP"))
     return parser
 
 
@@ -44,6 +56,10 @@ def main(argv: list[str] | None = None) -> int:
         return _inspect(args)
     if args.command == "convert":
         return _convert(args)
+    if args.command == "validate":
+        return _validate(args)
+    if args.command == "style":
+        return _style(args)
     parser.error(f"Unknown command: {args.command}")
     return 2
 
@@ -112,6 +128,53 @@ def _convert(args: argparse.Namespace) -> int:
         entities = parse_netcad(args.source).entities
     collection = write_geojson(entities, args.output, plan_type=args.plan_type)
     print(f"Wrote {len(collection['features'])} feature(s) to {args.output}")
+    return 0
+
+
+def _validate(args: argparse.Namespace) -> int:
+    from .validator import validate_plan
+
+    report = validate_plan(args.source, plan_type=args.plan_type)
+    if args.json:
+        print(json.dumps(report.to_dict(), indent=2, ensure_ascii=False))
+        return 0 if report.is_valid else 1
+    if args.markdown:
+        print(report.to_markdown())
+        return 0 if report.is_valid else 1
+
+    status = "VALID" if report.is_valid else "INVALID (Errors Found)"
+    print(f"PlanGML Compliance: {status} (Score: {report.quality_score:.1f}/100)")
+    print(f"Layers: {report.matched_layers}/{report.total_layers} classified")
+    print(f"Total Entities: {report.total_entities}")
+    if report.mandatory_layers_missing:
+        print(f"Missing Mandatory Concepts: {', '.join(report.mandatory_layers_missing)}")
+    if report.issues:
+        print(f"Issues Found ({len(report.issues)}):")
+        for iss in report.issues:
+            print(f"  [{iss.severity}] {iss.category} ({iss.layer_name}): {iss.message}")
+    return 0 if report.is_valid else 1
+
+
+def _style(args: argparse.Namespace) -> int:
+    from .styler import export_mapbox_style, export_plan_styles, export_qml, export_sld
+
+    reader = NetcadReader(args.source).index()
+    layer_names = [s.layer_name for s in reader.layer_summaries()]
+
+    if args.format == "all":
+        paths = export_plan_styles(args.out_dir, layer_names, plan_type=args.plan_type)
+        print(f"Generated styles in {args.out_dir}:")
+        for k, p in paths.items():
+            print(f"  - {k.upper()}: {p}")
+    elif args.format == "sld":
+        out = export_sld(layer_names, plan_type=args.plan_type)
+        print(out)
+    elif args.format == "qml":
+        out = export_qml(layer_names, plan_type=args.plan_type)
+        print(out)
+    elif args.format == "mapbox":
+        out = export_mapbox_style(layer_names, plan_type=args.plan_type)
+        print(json.dumps(out, indent=2, ensure_ascii=False))
     return 0
 
 

@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "NCZ2Geo"
-version = "0.1.0"
+version = "0.8.0"
 authors = [
     { name = "Yusuf Eminoğlu", email = "yusufeminoglu@gmail.com" }
 ]
-description = "Pure-Python Netcad NCZ/NCA reader with PlanGML identity and e-Plan symbology metadata."
+description = "Pure-Python Netcad NCZ Cadastral Parser, Topology QA, Land Consolidation & FlatGeobuf Suite."
 readme = "README.md"
 license = "GPL-2.0-or-later"
 requires-python = ">=3.9"
