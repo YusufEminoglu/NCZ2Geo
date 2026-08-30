@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0] - 2026-08-30
+### Added
+- **Cadastral Parcel Subdivision & Road Frontage Optimizer (`parcel_subdivision_optimizer.py`)**: Added `subdivide_cadastral_parcel` slicing parent parcel polygons into optimum zoning-compliant sub-lots along frontage axes.
+- **Cloud-Native GeoParquet 1.1 Exporter (`geoparquet_writer.py`)**: Added `export_entities_to_geoparquet` writing OGC WKB vector records with GeoParquet 1.1 embedded metadata.
+
 ## [0.8.0] - 2026-08-30
 ### Added
 - **Visvalingam-Whyatt Cadastral Boundary Simplifier (`cadastral_boundary_simplifier.py`)**: Added `simplify_cadastral_boundaries` using minimum triangle effective area preservation.

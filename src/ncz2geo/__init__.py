@@ -63,9 +63,19 @@ from .flatgeobuf_writer import (
     FlatGeobufExportResult,
     export_entities_to_flatgeobuf,
 )
+from .geoparquet_writer import (
+    GeoParquetExportResult,
+    GeoParquetMetadata,
+    export_entities_to_geoparquet,
+)
 from .cadastral_boundary_simplifier import (
     BoundarySimplificationResult,
     simplify_cadastral_boundaries,
+)
+from .parcel_subdivision_optimizer import (
+    ParcelSubdivisionResult,
+    SubdividedLot,
+    subdivide_cadastral_parcel,
 )
 from .land_consolidation import (
     ConsolidatedParcel,
@@ -91,7 +101,7 @@ from .zoning_density import (
     calculate_zoning_capacity,
 )
 
-__version__ = "0.8.0"
+__version__ = "0.9.0"
 __author__ = "Yusuf Eminoğlu"
 
 __all__ = [
@@ -163,4 +173,12 @@ __all__ = [
     # FlatGeobuf Exporter
     "export_entities_to_flatgeobuf",
     "FlatGeobufExportResult",
+    # Parcel Subdivision & Frontage Optimizer
+    "subdivide_cadastral_parcel",
+    "ParcelSubdivisionResult",
+    "SubdividedLot",
+    # GeoParquet Exporter
+    "export_entities_to_geoparquet",
+    "GeoParquetExportResult",
+    "GeoParquetMetadata",
 ]
