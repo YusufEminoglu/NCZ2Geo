@@ -63,6 +63,16 @@ from .flatgeobuf_writer import (
     FlatGeobufExportResult,
     export_entities_to_flatgeobuf,
 )
+from .cadastral_boundary_dispute_resolver import (
+    BoundaryDisputeResolutionReport,
+    DisputedSliverPolygon,
+    resolve_cadastral_boundary_disputes,
+)
+from .geozip_stream_archiver import (
+    ArchiveEntityEntry,
+    GeoZipArchiveResult,
+    create_geozip_spatial_archive,
+)
 from .cadastral_right_of_way_easement import (
     EasementCorridorResult,
     EasementParcelIntersection,
@@ -111,7 +121,7 @@ from .zoning_density import (
     calculate_zoning_capacity,
 )
 
-__version__ = "0.10.0"
+__version__ = "0.11.0"
 __author__ = "Yusuf Eminoğlu"
 
 __all__ = [
@@ -199,4 +209,12 @@ __all__ = [
     "export_entities_to_geobuff",
     "GeoBuffExportResult",
     "GeoBuffHeader",
+    # Cadastral Boundary Dispute Resolver
+    "resolve_cadastral_boundary_disputes",
+    "BoundaryDisputeResolutionReport",
+    "DisputedSliverPolygon",
+    # Streaming GeoZip Spatial Archive
+    "create_geozip_spatial_archive",
+    "GeoZipArchiveResult",
+    "ArchiveEntityEntry",
 ]

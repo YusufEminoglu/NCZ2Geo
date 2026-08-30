@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11.0] - 2026-08-30
+### Added
+- **Cadastral Boundary Dispute & Overlap Sliver Resolver (`cadastral_boundary_dispute_resolver.py`)**: Added `resolve_cadastral_boundary_disputes` detecting adjacent map sheet boundary overlaps and allocating micro-slivers cleanly.
+- **Compressed Streaming GeoZip Spatial Archive Bundle (`geozip_stream_archiver.py`)**: Added `create_geozip_spatial_archive` packaging multi-layer vector geometries and manifest metadata into portable containers.
+
 ## [0.10.0] - 2026-08-30
 ### Added
 - **Cadastral Right-of-Way Easement Slicer (`cadastral_right_of_way_easement.py`)**: Added `generate_easement_corridor_slices` for BOTAŞ/TEİAŞ infrastructure servitude buffers and compensation assessments.
