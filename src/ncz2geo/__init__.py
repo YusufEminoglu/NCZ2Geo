@@ -63,6 +63,16 @@ from .flatgeobuf_writer import (
     FlatGeobufExportResult,
     export_entities_to_flatgeobuf,
 )
+from .cadastral_right_of_way_easement import (
+    EasementCorridorResult,
+    EasementParcelIntersection,
+    generate_easement_corridor_slices,
+)
+from .geobuff_encoder import (
+    GeoBuffExportResult,
+    GeoBuffHeader,
+    export_entities_to_geobuff,
+)
 from .geoparquet_writer import (
     GeoParquetExportResult,
     GeoParquetMetadata,
@@ -101,7 +111,7 @@ from .zoning_density import (
     calculate_zoning_capacity,
 )
 
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 __author__ = "Yusuf Eminoğlu"
 
 __all__ = [
@@ -181,4 +191,12 @@ __all__ = [
     "export_entities_to_geoparquet",
     "GeoParquetExportResult",
     "GeoParquetMetadata",
+    # Cadastral Right-of-Way Easement Slicer
+    "generate_easement_corridor_slices",
+    "EasementCorridorResult",
+    "EasementParcelIntersection",
+    # GeoBuff Compact Binary Protocol
+    "export_entities_to_geobuff",
+    "GeoBuffExportResult",
+    "GeoBuffHeader",
 ]

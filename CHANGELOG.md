@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.10.0] - 2026-08-30
+### Added
+- **Cadastral Right-of-Way Easement Slicer (`cadastral_right_of_way_easement.py`)**: Added `generate_easement_corridor_slices` for BOTAŞ/TEİAŞ infrastructure servitude buffers and compensation assessments.
+- **GeoBuff Protocol-Buffer Binary Vector Serializer (`geobuff_encoder.py`)**: Added `export_entities_to_geobuff` writing delta-packed zigzag integers for ultra-compact mobile GIS streams.
+
 ## [0.9.0] - 2026-08-30
 ### Added
 - **Cadastral Parcel Subdivision & Road Frontage Optimizer (`parcel_subdivision_optimizer.py`)**: Added `subdivide_cadastral_parcel` slicing parent parcel polygons into optimum zoning-compliant sub-lots along frontage axes.

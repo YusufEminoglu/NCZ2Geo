@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "NCZ2Geo"
-version = "0.9.0"
+version = "0.10.0"
 authors = [
     { name = "Yusuf Eminoğlu", email = "yusufeminoglu@gmail.com" }
 ]
-description = "Pure-Python parser & converter for Netcad NCZ files to GeoJSON, Shapefile, DXF, GeoPackage, FlatGeobuf, GeoParquet and GIS standards."
+description = "Pure-Python parser & converter for Netcad NCZ files to GeoJSON, Shapefile, DXF, GeoPackage, FlatGeobuf, GeoParquet, GeoBuff and GIS standards."
 readme = "README.md"
 license = "GPL-2.0-or-later"
 requires-python = ">=3.9"
