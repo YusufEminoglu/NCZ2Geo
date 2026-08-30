@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.0] - 2026-08-30
+### Added
+- **3D Cadastral Condominium & Strata Title Slicer (`cadastral_condominium_strata_slicer.py`)**: Added `slice_condominium_strata_units` generating 3D volumetric legal units (Kat Mülkiyeti) and calculating land ownership shares (Arsa Payı).
+- **GeoPackage R-Tree Spatial Index Optimizer (`geopackage_spatial_indexer.py`)**: Added `optimize_geopackage_spatial_rtree` building fast in-memory R-Tree bounding box indices.
+
 ## [0.11.0] - 2026-08-30
 ### Added
 - **Cadastral Boundary Dispute & Overlap Sliver Resolver (`cadastral_boundary_dispute_resolver.py`)**: Added `resolve_cadastral_boundary_disputes` detecting adjacent map sheet boundary overlaps and allocating micro-slivers cleanly.

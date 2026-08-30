@@ -63,6 +63,16 @@ from .flatgeobuf_writer import (
     FlatGeobufExportResult,
     export_entities_to_flatgeobuf,
 )
+from .cadastral_condominium_strata_slicer import (
+    BuildingFloorStrataProfile,
+    StrataTitleUnitResult,
+    slice_condominium_strata_units,
+)
+from .geopackage_spatial_indexer import (
+    RTreeBoundingBoxFilter,
+    SpatialIndexOptimizationReport,
+    optimize_geopackage_spatial_rtree,
+)
 from .cadastral_boundary_dispute_resolver import (
     BoundaryDisputeResolutionReport,
     DisputedSliverPolygon,
@@ -121,7 +131,7 @@ from .zoning_density import (
     calculate_zoning_capacity,
 )
 
-__version__ = "0.11.0"
+__version__ = "0.12.0"
 __author__ = "Yusuf Eminoğlu"
 
 __all__ = [
@@ -217,4 +227,12 @@ __all__ = [
     "create_geozip_spatial_archive",
     "GeoZipArchiveResult",
     "ArchiveEntityEntry",
+    # 3D Cadastral Condominium & Strata Title Slicer
+    "slice_condominium_strata_units",
+    "StrataTitleUnitResult",
+    "BuildingFloorStrataProfile",
+    # GeoPackage R-Tree Spatial Index Optimizer
+    "optimize_geopackage_spatial_rtree",
+    "SpatialIndexOptimizationReport",
+    "RTreeBoundingBoxFilter",
 ]
