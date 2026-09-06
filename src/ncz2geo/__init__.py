@@ -131,7 +131,7 @@ from .zoning_density import (
     calculate_zoning_capacity,
 )
 
-__version__ = "0.12.0"
+__version__ = "0.12.1"
 __author__ = "Yusuf Eminoğlu"
 
 __all__ = [

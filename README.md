@@ -1,22 +1,22 @@
 <div align="center">
 
-<a href="https://yusufeminoglu.github.io/NCZ2Geo/">
-  <img src="https://raw.githubusercontent.com/YusufEminoglu/NCZ2Geo/main/docs/icons/logo.svg" width="140" height="140" alt="NCZ2Geo logo" />
+<a href="https://geophilo.com/">
+  <img src="https://geophilo.com/assets/sdk_icons/NCZ2Geo_sdk.svg" width="140" height="140" alt="NCZ2Geo logo" />
 </a>
 
 # NCZ2Geo
 
-[![CI](https://gitlab.com/geospacephilo/NCZ2Geo/actions/workflows/ci.yml/badge.svg)](https://gitlab.com/geospacephilo/NCZ2Geo/actions/workflows/ci.yml)
+
 [![PyPI version](https://img.shields.io/pypi/v/NCZ2Geo.svg?color=3b82f6)](https://pypi.org/project/NCZ2Geo/)
 [![Python version support](https://img.shields.io/pypi/pyversions/NCZ2Geo.svg?color=10b981)](https://pypi.org/project/NCZ2Geo/)
-[![Documentation](https://img.shields.io/badge/docs-GitLab%20Pages-06b6d4.svg)](https://yusufeminoglu.github.io/NCZ2Geo/)
+[![Documentation](https://img.shields.io/badge/docs-GEOPHILO-10b981.svg)](https://geophilo.com/)
 [![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL--2.0--or--later-blue.svg)](LICENSE)
 [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-D7FF64.svg)](https://docs.astral.sh/ruff/)
 [![Test Coverage](https://img.shields.io/badge/coverage-90%25%2B-brightgreen.svg)](#-development--testing)
 
 **Pure-Python Netcad NCZ/NCA Reader with PlanGML Identity and e-Plan Symbology Metadata.**
 
-[📖 **Open Interactive Web Manual (GitLab Pages)**](https://yusufeminoglu.github.io/NCZ2Geo/) • [📦 **PyPI Package**](https://pypi.org/project/NCZ2Geo/) • [🐛 **Issue Tracker**](https://gitlab.com/geospacephilo/NCZ2Geo/-/issues)
+[📖 **Open Interactive Web Manual (GitLab Pages)**](https://geophilo.com/) • [📦 **PyPI Package**](https://pypi.org/project/NCZ2Geo/) • [🐛 **Issue Tracker**](https://gitlab.com/geospacephilo/NCZ2Geo/-/issues)
 
 </div>
 
