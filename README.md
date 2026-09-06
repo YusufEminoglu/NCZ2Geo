@@ -6,17 +6,17 @@
 
 # NCZ2Geo
 
-[![CI](https://github.com/YusufEminoglu/NCZ2Geo/actions/workflows/ci.yml/badge.svg)](https://github.com/YusufEminoglu/NCZ2Geo/actions/workflows/ci.yml)
+[![CI](https://gitlab.com/geospacephilo/NCZ2Geo/actions/workflows/ci.yml/badge.svg)](https://gitlab.com/geospacephilo/NCZ2Geo/actions/workflows/ci.yml)
 [![PyPI version](https://img.shields.io/pypi/v/NCZ2Geo.svg?color=3b82f6)](https://pypi.org/project/NCZ2Geo/)
 [![Python version support](https://img.shields.io/pypi/pyversions/NCZ2Geo.svg?color=10b981)](https://pypi.org/project/NCZ2Geo/)
-[![Documentation](https://img.shields.io/badge/docs-GitHub%20Pages-06b6d4.svg)](https://yusufeminoglu.github.io/NCZ2Geo/)
+[![Documentation](https://img.shields.io/badge/docs-GitLab%20Pages-06b6d4.svg)](https://yusufeminoglu.github.io/NCZ2Geo/)
 [![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL--2.0--or--later-blue.svg)](LICENSE)
 [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-D7FF64.svg)](https://docs.astral.sh/ruff/)
 [![Test Coverage](https://img.shields.io/badge/coverage-90%25%2B-brightgreen.svg)](#-development--testing)
 
 **Pure-Python Netcad NCZ/NCA Reader with PlanGML Identity and e-Plan Symbology Metadata.**
 
-[📖 **Open Interactive Web Manual (GitHub Pages)**](https://yusufeminoglu.github.io/NCZ2Geo/) • [📦 **PyPI Package**](https://pypi.org/project/NCZ2Geo/) • [🐛 **Issue Tracker**](https://github.com/YusufEminoglu/NCZ2Geo/issues)
+[📖 **Open Interactive Web Manual (GitLab Pages)**](https://yusufeminoglu.github.io/NCZ2Geo/) • [📦 **PyPI Package**](https://pypi.org/project/NCZ2Geo/) • [🐛 **Issue Tracker**](https://gitlab.com/geospacephilo/NCZ2Geo/-/issues)
 
 </div>
 
@@ -161,7 +161,7 @@ Every exported GeoJSON feature includes standard Netcad CAD attributes plus enri
 
 ```bash
 # Clone the repository
-git clone https://github.com/YusufEminoglu/NCZ2Geo.git
+git clone https://gitlab.com/geospacephilo/NCZ2Geo.git
 cd NCZ2Geo
 
 # Install in editable mode with test dependencies
@@ -188,7 +188,7 @@ If you use **NCZ2Geo** in urban planning studies, cadastral automation pipelines
   year      = {2026},
   publisher = {PyPI - Python Package Index},
   version   = {0.1.0},
-  url       = {https://github.com/YusufEminoglu/NCZ2Geo}
+  url       = {https://gitlab.com/geospacephilo/NCZ2Geo}
 }
 ```
 
