@@ -54,7 +54,7 @@ ncz2geo = "ncz2geo.cli:main"
 Homepage = "https://geophilo.com/"
 Repository = "https://gitlab.com/geospacephilo/NCZ2Geo"
 Issues = "https://gitlab.com/geospacephilo/NCZ2Geo/-/issues"
-Documentation = "https://geophilo.com/"
+Documentation = "https://geophilo.com/NCZ2Geo/"
 Changelog = "https://gitlab.com/geospacephilo/NCZ2Geo/-/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
