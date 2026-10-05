@@ -8,7 +8,6 @@ import unittest
 from pathlib import Path
 
 from ncz2geo import (
-    ArchiveEntityEntry,
     BoundaryDisputeResolutionReport,
     GeoZipArchiveResult,
     NetcadCoordinate,

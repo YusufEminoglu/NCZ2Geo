@@ -4,13 +4,13 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
-from .ncz_engine.model import NetcadEntity, NetcadParseResult
-from .plangml import LayerClassification, classify_layer
-from .reader import NetcadReader, parse_netcad
+from .ncz_engine.model import NetcadEntity
+from .plangml import classify_layer
+from .reader import parse_netcad
 
 
 @dataclass

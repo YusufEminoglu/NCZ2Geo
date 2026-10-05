@@ -8,6 +8,7 @@ import struct
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Sequence
+
 from ncz2geo.ncz_engine.model import NetcadCoordinate, NetcadEntity
 
 

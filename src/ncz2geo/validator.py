@@ -5,11 +5,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
-from .ncz_engine.model import NetcadEntity, NetcadParseResult
+from .ncz_engine.model import NetcadParseResult
 from .plangml import LayerClassification, classify_layer, detect_plan_type, normalize_layer_name
-from .reader import NetcadReader, parse_netcad
+from .reader import NetcadReader
 
 
 @dataclass(frozen=True)

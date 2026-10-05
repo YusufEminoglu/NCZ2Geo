@@ -8,24 +8,19 @@ import unittest
 from pathlib import Path
 
 from ncz2geo import (
-    DATUM_PARAMS,
     Helmert7Params,
-    NetcadReader,
     affine_transform_2d,
     anonymize_ncz_attributes,
     compare_plans,
     export_citygml_lods,
     export_plangml_gml,
     helmert_7parameter_transform,
-    mask_pii_value,
     parse_netcad,
     transform_entities,
 )
 from ncz2geo.ncz_engine.model import (
     NetcadAttributeRow,
     NetcadAttributeTable,
-    NetcadCoordinate,
-    NetcadEntity,
 )
 from tests import ncz_fixtures as fx
 

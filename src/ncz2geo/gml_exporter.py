@@ -6,9 +6,9 @@ from __future__ import annotations
 import html
 import uuid
 from pathlib import Path
-from typing import Any, Iterable, Sequence
+from typing import Iterable
 
-from .ncz_engine.model import NetcadEntity, NetcadParseResult
+from .ncz_engine.model import NetcadEntity
 from .plangml import LayerClassification, classify_layer
 
 
@@ -117,8 +117,6 @@ def export_citygml_lods(
         if not e.coordinates or len(e.coordinates) < 3:
             continue
         c = classify_layer(e.layer_name)
-        # Check if building / structure
-        is_building = "YAPI" in e.layer_name or "BINA" in e.layer_name or "KONUT" in e.layer_name
 
         bldg_id = f"bldg_{idx+1}"
         pts = e.coordinates

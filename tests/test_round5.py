@@ -12,7 +12,6 @@ from ncz2geo import (
     KMLStyleConfig,
     NetcadCoordinate,
     NetcadEntity,
-    TopologyIssue,
     TopologyValidationReport,
     export_to_kml_kmz,
     validate_cadastral_topology,

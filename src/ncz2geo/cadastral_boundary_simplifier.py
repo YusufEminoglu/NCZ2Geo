@@ -4,9 +4,10 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Sequence
-from ncz2geo.ncz_engine.model import NetcadCoordinate, NetcadEntity
+
+from ncz2geo.ncz_engine.model import NetcadCoordinate
 
 
 @dataclass

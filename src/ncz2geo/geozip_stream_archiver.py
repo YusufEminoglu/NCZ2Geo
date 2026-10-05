@@ -5,9 +5,10 @@ from __future__ import annotations
 
 import json
 import zipfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Sequence
+
 from ncz2geo.ncz_engine.model import NetcadEntity
 
 
@@ -85,7 +86,7 @@ def create_geozip_spatial_archive(
                 "geozip_version": "1.0",
                 "srid": srid,
                 "feature_count": len(entities),
-                "layers": sorted(list(set(ent.layer_name for ent in entities if ent.layer_name))),
+                "layers": sorted({ent.layer_name for ent in entities if ent.layer_name}),
             }
             meta_str = json.dumps(meta, indent=2)
             raw_meta = meta_str.encode("utf-8")

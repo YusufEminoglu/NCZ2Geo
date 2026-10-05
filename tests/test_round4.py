@@ -6,7 +6,6 @@ from __future__ import annotations
 import unittest
 
 from ncz2geo import (
-    NetcadReader,
     ZoningCapacityReport,
     calculate_zoning_capacity,
     douglas_peucker_3d,

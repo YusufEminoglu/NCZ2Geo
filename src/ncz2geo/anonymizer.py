@@ -8,7 +8,7 @@ import re
 from dataclasses import dataclass
 from typing import Any, Iterable
 
-from .ncz_engine.model import NetcadAttributeRow, NetcadAttributeTable, NetcadParseResult
+from .ncz_engine.model import NetcadAttributeRow, NetcadAttributeTable
 
 # Common Turkish cadastral PII column keys
 PII_COLUMN_PATTERNS = [

@@ -3,12 +3,11 @@
 
 from __future__ import annotations
 
-import math
-from dataclasses import dataclass, field
-from typing import Any, Iterable, Sequence
+from dataclasses import dataclass
+from typing import Any, Iterable
 
 from .ncz_engine.model import NetcadEntity
-from .plangml import LayerClassification, classify_layer
+from .plangml import classify_layer
 
 
 @dataclass

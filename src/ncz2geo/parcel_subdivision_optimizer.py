@@ -3,10 +3,10 @@
 
 from __future__ import annotations
 
-import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Sequence
-from ncz2geo.ncz_engine.model import NetcadCoordinate, NetcadEntity
+
+from ncz2geo.ncz_engine.model import NetcadCoordinate
 
 
 @dataclass
@@ -134,7 +134,7 @@ def subdivide_cadastral_parcel(
             )
         )
 
-    tot_yield = sum(l.area_m2 for l in lots)
+    tot_yield = sum(lot.area_m2 for lot in lots)
     efficiency = (tot_yield / max(1e-4, parent_area)) * 100.0
 
     return ParcelSubdivisionResult(

@@ -3,8 +3,7 @@
 
 from __future__ import annotations
 
-import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Sequence
 
 
@@ -44,8 +43,7 @@ def slice_condominium_strata_units(
 ) -> StrataTitleUnitResult:
     """Generate 3D volumetric strata title cadastre units (Kat Mülkiyeti) and calculate land ownership shares (Arsa Payı)."""
     p = profile or BuildingFloorStrataProfile("Bldg_1")
-    poly = list(building_footprint_polygon)
-    
+
     tot_units = p.number_of_floors * p.units_per_floor
     if tot_units == 0:
         return StrataTitleUnitResult(p.building_id, 0, 0.0, 0.0, 0.0, [])

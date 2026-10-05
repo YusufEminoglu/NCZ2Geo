@@ -4,11 +4,11 @@
 from __future__ import annotations
 
 import struct
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Sequence
-from ncz2geo.ncz_engine.model import NetcadCoordinate, NetcadEntity
 
+from ncz2geo.ncz_engine.model import NetcadEntity
 
 # FlatGeobuf magic bytes: 'fgb' + 0x03 + 'fgb' + 0x00
 FGB_MAGIC = b"\x66\x67\x62\x03\x66\x67\x62\x00"
