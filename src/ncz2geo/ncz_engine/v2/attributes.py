@@ -8,6 +8,7 @@ Attribute records are located by scanning the file for the ASCII marker
 row variants (label / segment / ascii) as described in
 ``docs/NCZ_FORMAT.md``.
 """
+
 from __future__ import annotations
 
 import math
@@ -42,8 +43,7 @@ def find_attribute_markers(cursor: Cursor) -> list[AttributeMarker]:
         end = found + 4
         while end < cursor.size and 48 <= cursor.u8(end) <= 57:
             end += 1
-        table_ref = cursor.raw(found, end - found).decode(
-            "ascii", errors="ignore")
+        table_ref = cursor.raw(found, end - found).decode("ascii", errors="ignore")
         record_start = found
         ref_length = end - found
         if found > 0 and cursor.u8(found - 1) == ref_length:
@@ -54,34 +54,40 @@ def find_attribute_markers(cursor: Cursor) -> list[AttributeMarker]:
 
 
 def _u16(chunk: bytes, offset: int) -> int:
+    """Read a little-endian uint16 from *chunk*, or 0 when out of range."""
     if 0 <= offset and offset + 2 <= len(chunk):
-        return int.from_bytes(chunk[offset:offset + 2], "little")
+        return int.from_bytes(chunk[offset : offset + 2], "little")
     return 0
 
 
 def _u32(chunk: bytes, offset: int) -> int:
+    """Read a little-endian uint32 from *chunk*, or 0 when out of range."""
     if 0 <= offset and offset + 4 <= len(chunk):
-        return int.from_bytes(chunk[offset:offset + 4], "little")
+        return int.from_bytes(chunk[offset : offset + 4], "little")
     return 0
 
 
 def _f32(chunk: bytes, offset: int) -> float:
+    """Read a little-endian float32 from *chunk*, or 0.0 when out of range."""
     if 0 <= offset and offset + 4 <= len(chunk):
         return _F32.unpack_from(chunk, offset)[0]
     return 0.0
 
 
 def _f64(chunk: bytes, offset: int) -> float:
+    """Read a little-endian float64 from *chunk*, or 0.0 when out of range."""
     if 0 <= offset and offset + 8 <= len(chunk):
         return _F64.unpack_from(chunk, offset)[0]
     return 0.0
 
 
 def _byte(chunk: bytes, offset: int) -> int:
+    """Return the byte at *offset*, or 0 when out of range."""
     return chunk[offset] if 0 <= offset < len(chunk) else 0
 
 
 def _safe_round(value: float) -> float | None:
+    """Round *value* to six decimals, or None when it is not finite."""
     if not math.isfinite(value):
         return None
     if abs(value) < 1e-12:
@@ -90,20 +96,27 @@ def _safe_round(value: float) -> float | None:
 
 
 def _looks_like_coordinate(x: float | None, y: float | None) -> bool:
-    return (x is not None and y is not None
-            and math.isfinite(x) and math.isfinite(y)
-            and abs(x) <= COORDINATE_UPPER and abs(y) <= COORDINATE_UPPER
-            and (abs(x) >= COORDINATE_LOWER or abs(y) >= COORDINATE_LOWER))
+    """Return True when a pair resembles a plausible projected coordinate."""
+    return (
+        x is not None
+        and y is not None
+        and math.isfinite(x)
+        and math.isfinite(y)
+        and abs(x) <= COORDINATE_UPPER
+        and abs(y) <= COORDINATE_UPPER
+        and (abs(x) >= COORDINATE_LOWER or abs(y) >= COORDINATE_LOWER)
+    )
 
 
 def _collect_ascii_fields(chunk: bytes) -> list[str]:
+    """Collect unique length-prefixed printable ASCII strings from *chunk*."""
     values: list[str] = []
     seen: set[str] = set()
     for index in range(max(0, len(chunk) - 1)):
         length = chunk[index]
         if length <= 0 or length > 64 or index + 1 + length > len(chunk):
             continue
-        raw = chunk[index + 1:index + 1 + length]
+        raw = chunk[index + 1 : index + 1 + length]
         if not raw or not all(32 <= value < 127 for value in raw):
             continue
         value = raw.decode("ascii", errors="ignore").strip("\0 ")
@@ -114,8 +127,8 @@ def _collect_ascii_fields(chunk: bytes) -> list[str]:
     return values
 
 
-def _decode_label_row(chunk: bytes, label_text: str, label_length: int,
-                      row_index: int) -> dict:
+def _decode_label_row(chunk: bytes, label_text: str, label_length: int, row_index: int) -> dict:
+    """Decode a label-variant attribute record into columns."""
     separator = 29 + label_length
     columns = {
         "row_variant": "label",
@@ -139,12 +152,12 @@ def _decode_label_row(chunk: bytes, label_text: str, label_length: int,
         "coord_3_y": _safe_round(_f64(chunk, separator + 74)),
     }
     if len(chunk) >= 11:
-        columns["table_ref_inline"] = chunk[1:11].decode(
-            "ascii", errors="ignore").strip("\0 ")
+        columns["table_ref_inline"] = chunk[1:11].decode("ascii", errors="ignore").strip("\0 ")
     return {"row_index": row_index, "columns": columns}
 
 
 def _decode_segment_row(chunk: bytes, row_index: int) -> dict:
+    """Decode a coordinate-bearing segment attribute record into columns."""
     columns = {
         "row_variant": "segment",
         "record_length": len(chunk),
@@ -164,46 +177,43 @@ def _decode_segment_row(chunk: bytes, row_index: int) -> dict:
         "coord_3_y": _safe_round(_f64(chunk, 111)),
     }
     if len(chunk) >= 11:
-        columns["table_ref_inline"] = chunk[1:11].decode(
-            "ascii", errors="ignore").strip("\0 ")
+        columns["table_ref_inline"] = chunk[1:11].decode("ascii", errors="ignore").strip("\0 ")
     return {"row_index": row_index, "columns": columns}
 
 
 def _decode_ascii_row(chunk: bytes, table_ref: str, row_index: int) -> dict:
+    """Decode an unrecognized attribute record using its printable fields."""
     values = _collect_ascii_fields(chunk)
     columns = {
         "row_variant": "unknown",
         "record_length": len(chunk),
-        "ascii_values": " | ".join(
-            value for value in values if value != table_ref),
+        "ascii_values": " | ".join(value for value in values if value != table_ref),
     }
     if len(chunk) >= 11:
-        columns["table_ref_inline"] = chunk[1:11].decode(
-            "ascii", errors="ignore").strip("\0 ")
+        columns["table_ref_inline"] = chunk[1:11].decode("ascii", errors="ignore").strip("\0 ")
     return {"row_index": row_index, "columns": columns}
 
 
-def decode_attribute_row(chunk: bytes, table_ref: str,
-                         row_index: int) -> dict:
+def decode_attribute_row(chunk: bytes, table_ref: str, row_index: int) -> dict:
     """Classify and decode one attribute record."""
     label_length = _byte(chunk, 28)
     has_label = 1 <= label_length <= 64 and 29 + label_length <= len(chunk)
     if has_label:
-        label_bytes = chunk[29:29 + label_length]
+        label_bytes = chunk[29 : 29 + label_length]
         if all(32 <= value < 127 for value in label_bytes):
-            label_text = label_bytes.decode(
-                "ascii", errors="ignore").strip("\0 ")
+            label_text = label_bytes.decode("ascii", errors="ignore").strip("\0 ")
             if label_text:
-                return _decode_label_row(
-                    chunk, label_text, label_length, row_index)
+                return _decode_label_row(chunk, label_text, label_length, row_index)
 
     if len(chunk) >= 119:
         coord_0 = (_safe_round(_f64(chunk, 17)), _safe_round(_f64(chunk, 25)))
         coord_1 = (_safe_round(_f64(chunk, 45)), _safe_round(_f64(chunk, 53)))
         coord_2 = (_safe_round(_f64(chunk, 87)), _safe_round(_f64(chunk, 95)))
-        if (_looks_like_coordinate(*coord_0)
-                and _looks_like_coordinate(*coord_1)
-                and _looks_like_coordinate(*coord_2)):
+        if (
+            _looks_like_coordinate(*coord_0)
+            and _looks_like_coordinate(*coord_1)
+            and _looks_like_coordinate(*coord_2)
+        ):
             return _decode_segment_row(chunk, row_index)
 
     return _decode_ascii_row(chunk, table_ref, row_index)
@@ -225,14 +235,10 @@ def decode_attribute_tables(cursor: Cursor) -> list[dict]:
         record_end = min(cursor.size, next_start)
         if record_end <= marker.record_start:
             continue
-        chunk = cursor.raw(marker.record_start,
-                           record_end - marker.record_start)
+        chunk = cursor.raw(marker.record_start, record_end - marker.record_start)
         rows = tables.setdefault(marker.table_ref, [])
-        rows.append(decode_attribute_row(
-            chunk, marker.table_ref, len(rows) + 1))
+        rows.append(decode_attribute_row(chunk, marker.table_ref, len(rows) + 1))
 
     return [
-        {"table_ref": table_ref, "rows": rows}
-        for table_ref, rows in sorted(tables.items())
-        if rows
+        {"table_ref": table_ref, "rows": rows} for table_ref, rows in sorted(tables.items()) if rows
     ]

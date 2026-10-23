@@ -21,6 +21,7 @@ class GeoPackageExportResult:
     file_size_bytes: int
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the GeoPackage export result as a JSON-serializable dictionary."""
         return {
             "output_path": self.output_path,
             "total_features": self.total_features_written,
@@ -30,7 +31,9 @@ class GeoPackageExportResult:
         }
 
 
-def _create_gpkg_geometry_blob(coordinates: Sequence[tuple[float, float]], srs_id: int = 4326) -> bytes:
+def _create_gpkg_geometry_blob(
+    coordinates: Sequence[tuple[float, float]], srs_id: int = 4326
+) -> bytes:
     """Encode 2D Polygon WKB into standard OGC GeoPackage Binary Header format (GPKG 1.2)."""
     # GPKG Header: Magic 'GP' (0x47, 0x50), Version 0, Flags (byte order little endian = 1, empty = 0), SRS ID (uint32)
     magic = b"GP"

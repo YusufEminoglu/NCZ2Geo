@@ -15,6 +15,7 @@ The field order is public too. It is the order the coordinate and attribute
 readers fill, and the order a positional consumer expects, so fields are
 appended at the end rather than inserted.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

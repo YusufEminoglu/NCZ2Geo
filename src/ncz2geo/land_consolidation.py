@@ -41,6 +41,7 @@ class LandConsolidationReport:
     owner_shares: list[OwnershipShare]
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the land consolidation report as a JSON-serializable dictionary."""
         return {
             "total_pre_area_m2": round(self.total_pre_area_m2, 2),
             "total_post_allocated_m2": round(self.total_post_allocated_m2, 2),
@@ -84,7 +85,7 @@ def optimize_land_consolidation(
         net_area = s.pre_consolidation_area_m2 * (1.0 - dop_frac) * s.land_value_index
         s.post_consolidation_area_m2 = net_area
         s.deduction_ratio_pct = target_dop_rate_pct
-        pid = f"PARCEL_{idx+101}"
+        pid = f"PARCEL_{idx + 101}"
         s.allocated_parcel_id = pid
 
         # Calculate rectangular geometry along frontage
@@ -99,7 +100,7 @@ def optimize_land_consolidation(
 
         # Compactness ratio 4*pi*A / P^2
         perimeter = 2 * (p_width + parcel_depth)
-        compactness = (4 * math.pi * (p_width * parcel_depth)) / (perimeter ** 2)
+        compactness = (4 * math.pi * (p_width * parcel_depth)) / (perimeter**2)
 
         parcels.append(
             ConsolidatedParcel(

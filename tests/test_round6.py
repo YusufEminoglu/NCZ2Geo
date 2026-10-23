@@ -29,12 +29,20 @@ class TestNCZ2GeoRound6(unittest.TestCase):
 
     def test_land_consolidation_and_dop(self) -> None:
         shares = [
-            OwnershipShare(owner_id="Ali_Yilmaz", pre_consolidation_area_m2=5000.0, land_value_index=1.0),
-            OwnershipShare(owner_id="Ayse_Demir", pre_consolidation_area_m2=3000.0, land_value_index=0.9),
-            OwnershipShare(owner_id="Mehmet_Kaya", pre_consolidation_area_m2=2000.0, land_value_index=1.1),
+            OwnershipShare(
+                owner_id="Ali_Yilmaz", pre_consolidation_area_m2=5000.0, land_value_index=1.0
+            ),
+            OwnershipShare(
+                owner_id="Ayse_Demir", pre_consolidation_area_m2=3000.0, land_value_index=0.9
+            ),
+            OwnershipShare(
+                owner_id="Mehmet_Kaya", pre_consolidation_area_m2=2000.0, land_value_index=1.1
+            ),
         ]
 
-        report = optimize_land_consolidation(shares, target_dop_rate_pct=40.0, target_parcel_min_width_m=25.0)
+        report = optimize_land_consolidation(
+            shares, target_dop_rate_pct=40.0, target_parcel_min_width_m=25.0
+        )
 
         self.assertIsInstance(report, LandConsolidationReport)
         self.assertEqual(report.total_pre_area_m2, 10000.0)

@@ -18,9 +18,7 @@ from tests import ncz_fixtures as fx
 
 class TestPlanGmlGeoJsonAndCli(unittest.TestCase):
     def setUp(self) -> None:
-        self.tmp = Path(
-            tempfile.mkdtemp(prefix="ncz2geo-", dir=Path(__file__).resolve().parent)
-        )
+        self.tmp = Path(tempfile.mkdtemp(prefix="ncz2geo-", dir=Path(__file__).resolve().parent))
         self.addCleanup(lambda: _rmtree(self.tmp))
         self.source = self.tmp / "fixture.ncz"
         self.source.write_bytes(_planning_drawing())
@@ -74,8 +72,10 @@ class TestPlanGmlGeoJsonAndCli(unittest.TestCase):
             all(feature["properties"]["layer_code"] == 0 for feature in payload["features"])
         )
         self.assertTrue(
-            all(feature["properties"]["plangml_tabaka"] == "PL_GELISME_KONUT"
-                for feature in payload["features"])
+            all(
+                feature["properties"]["plangml_tabaka"] == "PL_GELISME_KONUT"
+                for feature in payload["features"]
+            )
         )
 
 

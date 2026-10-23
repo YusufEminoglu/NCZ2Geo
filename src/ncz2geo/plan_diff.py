@@ -41,6 +41,7 @@ class PlanDiffResult:
     changes: list[ZoningChangeItem]
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the plan diff scorecard as a JSON-serializable dictionary."""
         return {
             "plan_type": self.plan_type,
             "total_features_v1": self.total_features_v1,
@@ -48,12 +49,15 @@ class PlanDiffResult:
             "added_features_count": self.added_features_count,
             "removed_features_count": self.removed_features_count,
             "reclassified_features_count": self.reclassified_features_count,
-            "net_area_change_by_function": {k: round(v, 2) for k, v in self.net_area_change_by_function.items()},
+            "net_area_change_by_function": {
+                k: round(v, 2) for k, v in self.net_area_change_by_function.items()
+            },
             "changes_count": len(self.changes),
         }
 
 
 def _calc_area_and_centroid(coords: list[Any]) -> tuple[float, float, float]:
+    """Return (area, centroid_x, centroid_y) for an entity's coordinates."""
     n = len(coords)
     if n < 3:
         return 0.0, (coords[0].x if n > 0 else 0.0), (coords[0].y if n > 0 else 0.0)
@@ -81,14 +85,10 @@ def compare_plans(
 ) -> PlanDiffResult:
     """Compare two versions of an urban plan to detect zoning amendments and modifications."""
     entities1 = (
-        parse_netcad(plan_v1).entities
-        if isinstance(plan_v1, (str, Path))
-        else list(plan_v1)
+        parse_netcad(plan_v1).entities if isinstance(plan_v1, (str, Path)) else list(plan_v1)
     )
     entities2 = (
-        parse_netcad(plan_v2).entities
-        if isinstance(plan_v2, (str, Path))
-        else list(plan_v2)
+        parse_netcad(plan_v2).entities if isinstance(plan_v2, (str, Path)) else list(plan_v2)
     )
 
     # Compute centroids and properties
@@ -98,7 +98,9 @@ def compare_plans(
             area, cx, cy = _calc_area_and_centroid(e.coordinates)
             c = classify_layer(e.layer_name, plan_type=plan_type)
             fn_name = c.identity.fonksiyon_adi if c.identity else e.layer_name
-            props1.append({"entity": e, "area": area, "cx": cx, "cy": cy, "fn": fn_name, "matched": False})
+            props1.append(
+                {"entity": e, "area": area, "cx": cx, "cy": cy, "fn": fn_name, "matched": False}
+            )
 
     props2 = []
     for e in entities2:
@@ -106,7 +108,9 @@ def compare_plans(
             area, cx, cy = _calc_area_and_centroid(e.coordinates)
             c = classify_layer(e.layer_name, plan_type=plan_type)
             fn_name = c.identity.fonksiyon_adi if c.identity else e.layer_name
-            props2.append({"entity": e, "area": area, "cx": cx, "cy": cy, "fn": fn_name, "matched": False})
+            props2.append(
+                {"entity": e, "area": area, "cx": cx, "cy": cy, "fn": fn_name, "matched": False}
+            )
 
     changes: list[ZoningChangeItem] = []
     added_count = 0
@@ -145,7 +149,9 @@ def compare_plans(
                     )
                 )
                 net_area_by_fn[p1["fn"]] = net_area_by_fn.get(p1["fn"], 0.0) - p1["area"]
-                net_area_by_fn[best_p2["fn"]] = net_area_by_fn.get(best_p2["fn"], 0.0) + best_p2["area"]
+                net_area_by_fn[best_p2["fn"]] = (
+                    net_area_by_fn.get(best_p2["fn"], 0.0) + best_p2["area"]
+                )
             elif abs(area_delta) > 1.0:
                 changes.append(
                     ZoningChangeItem(

@@ -36,11 +36,15 @@ def export_plangml_gml(
             continue
 
         c: LayerClassification = classify_layer(entity.layer_name, plan_type=plan_type)
-        fid = f"PlanFeature_{idx+1}_{uuid.uuid4().hex[:6]}"
+        fid = f"PlanFeature_{idx + 1}_{uuid.uuid4().hex[:6]}"
         safe_layer = html.escape(entity.layer_name)
         safe_tabaka = html.escape(c.identity.tabaka if c.identity else entity.layer_name)
         safe_fonk_kod = html.escape(c.identity.fonksiyon_kodu if c.identity else "")
-        safe_fonk_adi = html.escape(c.identity.fonksiyon_adi if c.identity else (c.style.get("label", "") if c.style else ""))
+        safe_fonk_adi = html.escape(
+            c.identity.fonksiyon_adi
+            if c.identity
+            else (c.style.get("label", "") if c.style else "")
+        )
         safe_ust_grup = html.escape(c.identity.ust_grup_adi if c.identity else "")
 
         # Format coordinates according to geometry type
@@ -118,7 +122,7 @@ def export_citygml_lods(
             continue
         c = classify_layer(e.layer_name)
 
-        bldg_id = f"bldg_{idx+1}"
+        bldg_id = f"bldg_{idx + 1}"
         pts = e.coordinates
         # Ground points z=0, Roof points z=default_height
         ground_pts_str = " ".join(f"{p.x:.3f} {p.y:.3f} 0.000" for p in pts)

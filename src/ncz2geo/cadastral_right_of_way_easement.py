@@ -28,6 +28,7 @@ class EasementCorridorResult:
     parcel_impacts: list[EasementParcelIntersection]
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the easement corridor result as a JSON-serializable dictionary."""
         return {
             "length_m": round(self.corridor_length_m, 1),
             "width_m": round(self.corridor_width_m, 1),
@@ -70,7 +71,7 @@ def generate_easement_corridor_slices(
             if seg_len < 1e-4:
                 continue
             # Point to segment distance
-            u = ((cx - p1[0]) * (p2[0] - p1[0]) + (cy - p1[1]) * (p2[1] - p1[1])) / (seg_len ** 2)
+            u = ((cx - p1[0]) * (p2[0] - p1[0]) + (cy - p1[1]) * (p2[1] - p1[1])) / (seg_len**2)
             u = max(0.0, min(1.0, u))
             proj_x = p1[0] + u * (p2[0] - p1[0])
             proj_y = p1[1] + u * (p2[1] - p1[1])

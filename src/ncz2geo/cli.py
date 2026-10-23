@@ -14,6 +14,7 @@ from .reader import NetcadReader, parse_netcad
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the argparse command-line parser with all subcommands."""
     parser = argparse.ArgumentParser(
         prog="ncz2geo",
         description="Inspect Netcad NCZ/NCA files and export PlanGML-aware GeoJSON.",
@@ -21,12 +22,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="version", version=f"NCZ2Geo {__version__}")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    inspect_parser = subparsers.add_parser("inspect", help="List NCZ/NCA layers and PlanGML matches.")
+    inspect_parser = subparsers.add_parser(
+        "inspect", help="List NCZ/NCA layers and PlanGML matches."
+    )
     inspect_parser.add_argument("source", type=Path)
     inspect_parser.add_argument("--plan-type", default="UIP", choices=("UIP", "NIP", "CDP"))
     inspect_parser.add_argument("--json", action="store_true", help="Print machine-readable JSON.")
 
-    convert_parser = subparsers.add_parser("convert", help="Convert an NCZ/NCA file to styled GeoJSON.")
+    convert_parser = subparsers.add_parser(
+        "convert", help="Convert an NCZ/NCA file to styled GeoJSON."
+    )
     convert_parser.add_argument("source", type=Path)
     convert_parser.add_argument("output", type=Path)
     convert_parser.add_argument("--plan-type", default="UIP", choices=("UIP", "NIP", "CDP"))
@@ -39,9 +44,13 @@ def build_parser() -> argparse.ArgumentParser:
     val_parser.add_argument("source", type=Path)
     val_parser.add_argument("--plan-type", choices=("UIP", "NIP", "CDP"))
     val_parser.add_argument("--json", action="store_true", help="Output validation report as JSON.")
-    val_parser.add_argument("--markdown", action="store_true", help="Output validation report as Markdown.")
+    val_parser.add_argument(
+        "--markdown", action="store_true", help="Output validation report as Markdown."
+    )
 
-    style_parser = subparsers.add_parser("style", help="Generate OGC SLD, QGIS QML, or Mapbox GL styles.")
+    style_parser = subparsers.add_parser(
+        "style", help="Generate OGC SLD, QGIS QML, or Mapbox GL styles."
+    )
     style_parser.add_argument("source", type=Path)
     style_parser.add_argument("--format", choices=("sld", "qml", "mapbox", "all"), default="all")
     style_parser.add_argument("--out-dir", type=Path, default=Path("."))
@@ -50,6 +59,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Dispatch the requested subcommand and return its exit code."""
     parser = build_parser()
     args = parser.parse_args(argv)
     if args.command == "inspect":
@@ -65,6 +75,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _inspect(args: argparse.Namespace) -> int:
+    """List a drawing's layers with their PlanGML classification."""
     reader = NetcadReader(args.source).index()
     summaries = reader.layer_summaries()
     classified = [
@@ -120,6 +131,7 @@ def _inspect(args: argparse.Namespace) -> int:
 
 
 def _convert(args: argparse.Namespace) -> int:
+    """Convert a drawing (or selected layers) to styled GeoJSON."""
     if args.layers:
         layer_codes = [int(part.strip()) for part in args.layers.split(",") if part.strip()]
         reader = NetcadReader(args.source).index()
@@ -132,6 +144,7 @@ def _convert(args: argparse.Namespace) -> int:
 
 
 def _validate(args: argparse.Namespace) -> int:
+    """Validate a drawing for PlanGML and e-Plan compliance."""
     from .validator import validate_plan
 
     report = validate_plan(args.source, plan_type=args.plan_type)
@@ -156,6 +169,7 @@ def _validate(args: argparse.Namespace) -> int:
 
 
 def _style(args: argparse.Namespace) -> int:
+    """Generate OGC SLD, QGIS QML, or Mapbox GL style documents."""
     from .styler import export_mapbox_style, export_plan_styles, export_qml, export_sld
 
     reader = NetcadReader(args.source).index()

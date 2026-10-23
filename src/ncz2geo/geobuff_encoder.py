@@ -28,6 +28,7 @@ class GeoBuffExportResult:
     output_path: str
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the GeoBuff export result as a JSON-serializable dictionary."""
         return {
             "feature_count": self.feature_count,
             "size_bytes": self.file_size_bytes,

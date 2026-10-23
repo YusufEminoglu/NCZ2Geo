@@ -30,12 +30,14 @@ class KMLExportResult:
     kmz_bytes: bytes
 
     def save_kml(self, output_path: str | Path) -> Path:
+        """Write the KML document to *output_path* and return the written path."""
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(self.kml_string, encoding="utf-8")
         return out
 
     def save_kmz(self, output_path: str | Path) -> Path:
+        """Write the zipped KMZ payload to *output_path* and return the written path."""
         out = Path(output_path)
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_bytes(self.kmz_bytes)
@@ -68,7 +70,9 @@ def export_to_kml_kmz(
 
         coords_str = " ".join(coords_kml_list)
 
-        if ent.geometry_kind in ("POLYGON", "PARCEL", "CLOSED_POLYLINE") or (ent.is_closed and len(ent.coordinates) >= 3):
+        if ent.geometry_kind in ("POLYGON", "PARCEL", "CLOSED_POLYLINE") or (
+            ent.is_closed and len(ent.coordinates) >= 3
+        ):
             # Ensure closed ring
             if ent.coordinates[0] != ent.coordinates[-1]:
                 coords_str += f" {coords_kml_list[0]}"

@@ -19,6 +19,7 @@ class BoundarySimplificationResult:
     simplified_coordinates: list[tuple[float, float]]
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the boundary simplification result as a JSON-serializable dictionary."""
         return {
             "original_vertices": self.original_vertex_count,
             "simplified_vertices": self.simplified_vertex_count,
@@ -27,11 +28,15 @@ class BoundarySimplificationResult:
         }
 
 
-def _triangle_area(p1: tuple[float, float], p2: tuple[float, float], p3: tuple[float, float]) -> float:
+def _triangle_area(
+    p1: tuple[float, float], p2: tuple[float, float], p3: tuple[float, float]
+) -> float:
+    """Return the unsigned area of the triangle formed by three points."""
     return abs(p1[0] * (p2[1] - p3[1]) + p2[0] * (p3[1] - p1[1]) + p3[0] * (p1[1] - p2[1])) * 0.5
 
 
 def _polygon_area(pts: Sequence[tuple[float, float]]) -> float:
+    """Return the unsigned shoelace area of a polygon ring."""
     if len(pts) < 3:
         return 0.0
     area = 0.0
@@ -65,7 +70,7 @@ def simplify_cadastral_boundaries(
             simplified_coordinates=pts,
         )
 
-    is_closed = (math.hypot(pts[0][0] - pts[-1][0], pts[0][1] - pts[-1][1]) < 1e-4)
+    is_closed = math.hypot(pts[0][0] - pts[-1][0], pts[0][1] - pts[-1][1]) < 1e-4
     orig_area = _polygon_area(pts)
 
     working = list(pts)
@@ -95,7 +100,9 @@ def simplify_cadastral_boundaries(
         working.append(working[0])
 
     simplified_area = _polygon_area(working)
-    area_change = (abs(simplified_area - orig_area) / max(1e-4, orig_area)) * 100.0 if orig_area > 0 else 0.0
+    area_change = (
+        (abs(simplified_area - orig_area) / max(1e-4, orig_area)) * 100.0 if orig_area > 0 else 0.0
+    )
     compression = ((len(pts) - len(working)) / max(1, len(pts))) * 100.0
 
     return BoundarySimplificationResult(

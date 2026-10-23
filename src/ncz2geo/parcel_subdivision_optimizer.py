@@ -27,6 +27,7 @@ class ParcelSubdivisionResult:
     lots: list[SubdividedLot]
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the parcel subdivision result as a JSON-serializable dictionary."""
         return {
             "parent_area_m2": round(self.parent_area_m2, 1),
             "lots_count": self.subdivided_lots_count,
@@ -36,6 +37,7 @@ class ParcelSubdivisionResult:
 
 
 def _polygon_area(pts: Sequence[tuple[float, float]]) -> float:
+    """Return the unsigned shoelace area of a polygon ring."""
     if len(pts) < 3:
         return 0.0
     area = 0.0
@@ -70,7 +72,9 @@ def subdivide_cadastral_parcel(
     parent_area = _polygon_area(pts)
     if parent_area < target_lot_min_area_m2:
         # Cannot subdivide
-        lot = SubdividedLot("LOT_1", parent_area, min_frontage_width_m, parent_area / min_frontage_width_m, pts)
+        lot = SubdividedLot(
+            "LOT_1", parent_area, min_frontage_width_m, parent_area / min_frontage_width_m, pts
+        )
         return ParcelSubdivisionResult(parent_area, 1, parent_area, 100.0, [lot])
 
     # Compute bounding box

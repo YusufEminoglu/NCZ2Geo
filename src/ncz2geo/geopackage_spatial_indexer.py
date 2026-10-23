@@ -27,6 +27,7 @@ class SpatialIndexOptimizationReport:
     matching_entities_in_query: int
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the spatial index optimization report as a JSON-serializable dictionary."""
         return {
             "indexed_count": self.total_entities_indexed,
             "rtree_depth": self.rtree_depth_levels,
@@ -79,7 +80,9 @@ def optimize_geopackage_spatial_rtree(
         qb = test_query_bbox
         for bx_min, bx_max, by_min, by_max in entity_boxes:
             # Overlap check
-            if not (bx_max < qb.min_x or bx_min > qb.max_x or by_max < qb.min_y or by_min > qb.max_y):
+            if not (
+                bx_max < qb.min_x or bx_min > qb.max_x or by_max < qb.min_y or by_min > qb.max_y
+            ):
                 matches += 1
     else:
         matches = n

@@ -29,6 +29,7 @@ class BoundaryDisputeResolutionReport:
     resolved_disputes: list[DisputedSliverPolygon]
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the dispute resolution report as a JSON-serializable dictionary."""
         return {
             "evaluated_parcels": self.total_parcels_evaluated,
             "slivers_found": self.disputed_slivers_found_count,
@@ -55,14 +56,16 @@ def resolve_cadastral_boundary_disputes(
                 area = 1000.0
             else:
                 cx, cy, area = 0.0, 0.0, 0.0
-            parcels.append({"id": f"Parcel_{i+1}", "cx": cx, "cy": cy, "area": area})
+            parcels.append({"id": f"Parcel_{i + 1}", "cx": cx, "cy": cy, "area": area})
         else:
-            parcels.append({
-                "id": str(p.get("id", f"Parcel_{i+1}")),
-                "cx": float(p.get("cx", 0.0)),
-                "cy": float(p.get("cy", 0.0)),
-                "area": float(p.get("area", 1000.0)),
-            })
+            parcels.append(
+                {
+                    "id": str(p.get("id", f"Parcel_{i + 1}")),
+                    "cx": float(p.get("cx", 0.0)),
+                    "cy": float(p.get("cy", 0.0)),
+                    "area": float(p.get("area", 1000.0)),
+                }
+            )
 
     n = len(parcels)
     disputes: list[DisputedSliverPolygon] = []
@@ -83,7 +86,7 @@ def resolve_cadastral_boundary_disputes(
 
                 disputes.append(
                     DisputedSliverPolygon(
-                        dispute_id=f"DISPUTE_{len(disputes)+1}",
+                        dispute_id=f"DISPUTE_{len(disputes) + 1}",
                         parcel_a_id=p1["id"],
                         parcel_b_id=p2["id"],
                         sliver_area_m2=round(sliver, 2),

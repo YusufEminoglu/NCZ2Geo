@@ -27,6 +27,7 @@ class StrataTitleUnitResult:
     strata_units_list: list[dict[str, Any]]
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the strata title result as a JSON-serializable dictionary."""
         return {
             "building_id": self.building_id,
             "total_units": self.total_strata_units_count,
@@ -65,16 +66,18 @@ def slice_condominium_strata_units(
             unit_no = f * p.units_per_floor + (u + 1)
             unit_id = f"{p.building_id}_F{floor_num}_U{unit_no}"
 
-            units_data.append({
-                "unit_id": unit_id,
-                "floor_number": floor_num,
-                "unit_number": unit_no,
-                "z_min_m": round(z_min, 2),
-                "z_max_m": round(z_max, 2),
-                "net_area_m2": round(area_per_unit, 2),
-                "land_share_fraction": f"1/{tot_units}",
-                "land_share_pct": round(land_share * 100.0, 2),
-            })
+            units_data.append(
+                {
+                    "unit_id": unit_id,
+                    "floor_number": floor_num,
+                    "unit_number": unit_no,
+                    "z_min_m": round(z_min, 2),
+                    "z_max_m": round(z_max, 2),
+                    "net_area_m2": round(area_per_unit, 2),
+                    "land_share_fraction": f"1/{tot_units}",
+                    "land_share_pct": round(land_share * 100.0, 2),
+                }
+            )
 
     return StrataTitleUnitResult(
         building_id=p.building_id,

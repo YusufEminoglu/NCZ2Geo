@@ -30,6 +30,7 @@ class TopologyValidationReport:
     issues: list[TopologyIssue]
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the topology validation report as a JSON-serializable dictionary."""
         return {
             "total_entities_checked": self.total_entities_checked,
             "is_valid": self.is_topologically_valid,
@@ -42,11 +43,15 @@ class TopologyValidationReport:
 
 
 def _ccw(a: tuple[float, float], b: tuple[float, float], c: tuple[float, float]) -> bool:
+    """Return True when points a, b, c wind counter-clockwise."""
     return (c[1] - a[1]) * (b[0] - a[0]) > (b[1] - a[1]) * (c[0] - a[0])
 
 
 def _segments_intersect(
-    p1: tuple[float, float], p2: tuple[float, float], p3: tuple[float, float], p4: tuple[float, float]
+    p1: tuple[float, float],
+    p2: tuple[float, float],
+    p3: tuple[float, float],
+    p4: tuple[float, float],
 ) -> bool:
     """Return True if line segments p1-p2 and p3-p4 intersect properly."""
     return (_ccw(p1, p3, p4) != _ccw(p2, p3, p4)) and (_ccw(p1, p2, p3) != _ccw(p1, p2, p4))
@@ -74,7 +79,10 @@ def validate_cadastral_topology(
 
         # 1. Check duplicate consecutive vertices
         for i in range(len(pts) - 1):
-            if math.hypot(pts[i][0] - pts[i + 1][0], pts[i][1] - pts[i + 1][1]) < vertex_tolerance_m:
+            if (
+                math.hypot(pts[i][0] - pts[i + 1][0], pts[i][1] - pts[i + 1][1])
+                < vertex_tolerance_m
+            ):
                 dups += 1
                 issues.append(
                     TopologyIssue(
@@ -136,12 +144,12 @@ def validate_cadastral_topology(
                                     issue_type="SELF_INTERSECTION",
                                     entity_index=idx,
                                     layer_name=layer,
-                                    description=f"Edges {i}-{i+1} and {j}-{j+1} intersect",
+                                    description=f"Edges {i}-{i + 1} and {j}-{j + 1} intersect",
                                     location=p1,
                                 )
                             )
 
-    is_valid = (self_ints == 0 and unclosed == 0 and zero_areas == 0 and dups == 0)
+    is_valid = self_ints == 0 and unclosed == 0 and zero_areas == 0 and dups == 0
 
     return TopologyValidationReport(
         total_entities_checked=len(entities),

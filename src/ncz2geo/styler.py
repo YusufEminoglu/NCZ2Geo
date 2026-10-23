@@ -265,7 +265,9 @@ def export_plan_styles(
     sld_path.write_text(export_sld(layer_names, plan_type=plan_type), encoding="utf-8")
     qml_path.write_text(export_qml(layer_names, plan_type=plan_type), encoding="utf-8")
     mb_path.write_text(
-        json.dumps(export_mapbox_style(layer_names, plan_type=plan_type), indent=2, ensure_ascii=False),
+        json.dumps(
+            export_mapbox_style(layer_names, plan_type=plan_type), indent=2, ensure_ascii=False
+        ),
         encoding="utf-8",
     )
 

@@ -40,6 +40,7 @@ class ZoningCapacityReport:
     parcels: list[ParcelCapacityItem]
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the zoning capacity report as a JSON-serializable dictionary."""
         return {
             "plan_type": self.plan_type,
             "total_plan_area_ha": round(self.total_plan_area_m2 / 10000.0, 2),
@@ -54,6 +55,7 @@ class ZoningCapacityReport:
 
 
 def _calc_entity_area(entity: NetcadEntity) -> float:
+    """Return the unsigned shoelace area of an entity's coordinates."""
     coords = entity.coordinates
     n = len(coords)
     if n < 3:
@@ -99,7 +101,9 @@ def calculate_zoning_capacity(
         is_residential = "KONUT" in upper_fn or "GELISME" in upper_fn or "MESKEN" in upper_fn
         is_commercial = "TICARET" in upper_fn or "TURIZM" in upper_fn or "OFIZ" in upper_fn
         is_green = "PARK" in upper_fn or "YESIL" in upper_fn or "REKREASYON" in upper_fn
-        is_road = "YOL" in upper_fn or "SOKAK" in upper_fn or "CADDE" in upper_fn or "MEYDAN" in upper_fn
+        is_road = (
+            "YOL" in upper_fn or "SOKAK" in upper_fn or "CADDE" in upper_fn or "MEYDAN" in upper_fn
+        )
 
         if is_residential:
             tot_res_area += area

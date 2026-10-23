@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Iterable
 
 from .ncz_engine.model import NetcadEntity
-from .plangml import classification_properties, classify_entity
+from .plangml import LayerClassification, classification_properties, classify_entity
 
 
 def entities_to_feature_collection(
@@ -50,6 +50,7 @@ def write_geojson(
 
 
 def _entity_geometry(entity: NetcadEntity) -> dict | None:
+    """Build a GeoJSON geometry for an entity, or None when it has no vertices."""
     coords = [[coord.x, coord.y, coord.z] for coord in entity.coordinates]
     kind = entity.geometry_kind.lower()
     if not coords:
@@ -68,7 +69,8 @@ def _entity_geometry(entity: NetcadEntity) -> dict | None:
     return {"type": "LineString", "coordinates": coords}
 
 
-def _entity_properties(entity: NetcadEntity, classification) -> dict:
+def _entity_properties(entity: NetcadEntity, classification: LayerClassification) -> dict:
+    """Flatten CAD attributes and classification data into GeoJSON properties."""
     return {
         "geometry_kind": entity.geometry_kind,
         "layer_code": entity.layer_code,

@@ -30,6 +30,7 @@ class GeoZipArchiveResult:
     entries: list[ArchiveEntityEntry]
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the GeoZip archive result as a JSON-serializable dictionary."""
         return {
             "archive_path": self.archive_path,
             "files_count": self.total_files_count,
@@ -61,12 +62,14 @@ def create_geozip_spatial_archive(
                     coords = [[pt.x, pt.y] for pt in ent.coordinates]
                     geom_type = "Polygon" if ent.is_closed else "LineString"
                     geom_coords = [coords] if ent.is_closed else coords
-                    features.append({
-                        "type": "Feature",
-                        "id": f"feat_{i+1}",
-                        "properties": {"layer": ent.layer_name, "code": ent.layer_code},
-                        "geometry": {"type": geom_type, "coordinates": geom_coords},
-                    })
+                    features.append(
+                        {
+                            "type": "Feature",
+                            "id": f"feat_{i + 1}",
+                            "properties": {"layer": ent.layer_name, "code": ent.layer_code},
+                            "geometry": {"type": geom_type, "coordinates": geom_coords},
+                        }
+                    )
 
             geojson_str = json.dumps({"type": "FeatureCollection", "features": features}, indent=2)
             raw_bytes = geojson_str.encode("utf-8")

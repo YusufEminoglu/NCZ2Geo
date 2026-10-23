@@ -32,6 +32,7 @@ class LayerSummary:
     families: set[str] = field(default_factory=set)
 
     def to_dict(self) -> dict:
+        """Return the layer summary as a JSON-serializable dictionary."""
         return {
             "layer_code": self.layer_code,
             "layer_name": self.layer_name,
@@ -41,6 +42,7 @@ class LayerSummary:
 
     @classmethod
     def from_dict(cls, payload: dict) -> "LayerSummary":
+        """Rebuild a layer summary from its dictionary form."""
         return cls(
             layer_code=int(payload.get("layer_code", 0)),
             layer_name=str(payload.get("layer_name", "")),
@@ -53,6 +55,7 @@ class NetcadReader:
     """Catalog-backed reader for selective, layer-by-layer NCZ/NCA decoding."""
 
     def __init__(self, path: str | Path) -> None:
+        """Store the source path and prepare empty index state."""
         self.path = Path(path)
         self.backend = ""
         self.from_cache = False
@@ -99,28 +102,34 @@ class NetcadReader:
 
     @property
     def version_name(self) -> str:
+        """Drawing version string recorded in the source, if any."""
         self._ensure_indexed()
         return str(getattr(self._metadata, "version_name", ""))
 
     @property
     def epsg(self) -> str:
+        """EPSG code declared by the source, if any."""
         self._ensure_indexed()
         return str(getattr(self._metadata, "epsg", ""))
 
     @property
     def projection_text(self) -> str:
+        """Human-readable projection description declared by the source."""
         self._ensure_indexed()
         return str(getattr(self._metadata, "projection_text", ""))
 
     def layer_summaries(self) -> list[LayerSummary]:
+        """Return the catalogued layer summaries, indexing on first use."""
         self._ensure_indexed()
         return list(self._summaries)
 
     def attribute_tables(self) -> list[NetcadAttributeTable]:
+        """Return the decoded attribute tables for the source."""
         self._ensure_indexed()
         return [_attribute_table_from_dict(item) for item in self._attribute_tables]
 
     def decode_layers(self, layer_codes: Iterable[int]) -> list[NetcadEntity]:
+        """Decode and return entities belonging to *layer_codes* only."""
         self._ensure_indexed()
         codes = [int(code) for code in layer_codes]
         if not codes:
@@ -134,6 +143,7 @@ class NetcadReader:
         return _result_from_payload(parse_file(str(self.path)))
 
     def _ensure_indexed(self) -> None:
+        """Index the source lazily if it has not been indexed yet."""
         if not self.backend:
             self.index()
 
@@ -149,11 +159,11 @@ def parse_netcad(path: str | Path) -> NetcadParseResult:
 
 
 def _result_from_payload(payload: dict) -> NetcadParseResult:
+    """Build a NetcadParseResult from the engine's raw payload dict."""
     return NetcadParseResult(
         entities=[_entity_from_dict(item) for item in payload.get("entities", [])],
         attribute_tables=[
-            _attribute_table_from_dict(item)
-            for item in payload.get("attribute_tables", [])
+            _attribute_table_from_dict(item) for item in payload.get("attribute_tables", [])
         ],
         layer_names=list(payload.get("layer_names", [])),
         layer_colors=list(payload.get("layer_colors", [])),
@@ -169,6 +179,7 @@ def _result_from_payload(payload: dict) -> NetcadParseResult:
 
 
 def _entity_from_dict(payload: dict) -> NetcadEntity:
+    """Rebuild a NetcadEntity from its engine dictionary form."""
     return NetcadEntity(
         geometry_kind=str(payload.get("geometry_kind", "")),
         layer_code=int(payload.get("layer_code", 0)),
@@ -199,6 +210,7 @@ def _entity_from_dict(payload: dict) -> NetcadEntity:
 
 
 def _attribute_table_from_dict(payload: dict) -> NetcadAttributeTable:
+    """Rebuild a NetcadAttributeTable from its engine dictionary form."""
     return NetcadAttributeTable(
         table_ref=str(payload.get("table_ref", "")),
         rows=[

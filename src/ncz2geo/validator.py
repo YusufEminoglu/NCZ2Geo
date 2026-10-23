@@ -23,6 +23,7 @@ class PlanValidationIssue:
     code: str
 
     def to_dict(self) -> dict[str, str]:
+        """Return the validation issue as a JSON-serializable dictionary."""
         return {
             "severity": self.severity,
             "category": self.category,
@@ -53,6 +54,7 @@ class PlanValidationReport:
         return not any(issue.severity == "ERROR" for issue in self.issues)
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the validation report as a JSON-serializable dictionary."""
         return {
             "plan_type": self.plan_type,
             "is_valid": self.is_valid,
@@ -101,8 +103,14 @@ class PlanValidationReport:
             lines.append("| Severity | Category | Layer | Message | Code |")
             lines.append("| --- | --- | --- | --- | --- |")
             for iss in self.issues:
-                icon = "🔴" if iss.severity == "ERROR" else ("🟡" if iss.severity == "WARNING" else "ℹ️")
-                lines.append(f"| {icon} {iss.severity} | {iss.category} | `{iss.layer_name}` | {iss.message} | `{iss.code}` |")
+                icon = (
+                    "🔴"
+                    if iss.severity == "ERROR"
+                    else ("🟡" if iss.severity == "WARNING" else "ℹ️")
+                )
+                lines.append(
+                    f"| {icon} {iss.severity} | {iss.category} | `{iss.layer_name}` | {iss.message} | `{iss.code}` |"
+                )
             lines.append("")
 
         return "\n".join(lines)

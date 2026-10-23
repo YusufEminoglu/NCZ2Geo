@@ -37,6 +37,7 @@ class AnonymizationReport:
     scrubbed_columns: list[str]
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the anonymization report as a JSON-serializable dictionary."""
         return {
             "total_tables": self.total_tables,
             "total_rows": self.total_rows,

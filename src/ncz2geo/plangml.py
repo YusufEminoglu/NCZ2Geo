@@ -10,22 +10,24 @@ from .eplan_catalog import EPLAN_CATALOG, EPLAN_PLAN_TYPES
 from .ncz_engine.model import NetcadEntity
 from .plangml_schema import TabakaIdentity, lookup_tabaka
 
-_TR_MAP = str.maketrans({
-    "Ç": "C",
-    "Ğ": "G",
-    "I": "I",
-    "İ": "I",
-    "Ö": "O",
-    "Ş": "S",
-    "Ü": "U",
-    "ç": "C",
-    "ğ": "G",
-    "ı": "I",
-    "i": "I",
-    "ö": "O",
-    "ş": "S",
-    "ü": "U",
-})
+_TR_MAP = str.maketrans(
+    {
+        "Ç": "C",
+        "Ğ": "G",
+        "I": "I",
+        "İ": "I",
+        "Ö": "O",
+        "Ş": "S",
+        "Ü": "U",
+        "ç": "C",
+        "ğ": "G",
+        "ı": "I",
+        "i": "I",
+        "ö": "O",
+        "ş": "S",
+        "ü": "U",
+    }
+)
 
 _PLAN_TYPE_FALLBACK = {
     "UIP": ("UIP", "NIP", "CDP"),
@@ -76,9 +78,11 @@ class LayerClassification:
 
     @property
     def matched(self) -> bool:
+        """Return True when the layer resolves to an identity or style."""
         return self.identity is not None or self.style is not None
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the classification as a JSON-serializable dictionary."""
         identity = _identity_dict(self.identity)
         return {
             "layer_name": self.layer_name,
@@ -95,7 +99,11 @@ def detect_plan_type(name: str | None) -> str | None:
     """Infer UIP/NIP/CDP from a file or layer name."""
     if not name:
         return None
-    tokens = [token for token in normalize_layer_name(name, strip_known_prefixes=False).split("_") if token]
+    tokens = [
+        token
+        for token in normalize_layer_name(name, strip_known_prefixes=False).split("_")
+        if token
+    ]
     for token in tokens:
         if token in _PLAN_TYPE_WORDS:
             return _PLAN_TYPE_WORDS[token]
@@ -124,7 +132,9 @@ def classify_entity(entity: NetcadEntity, plan_type: str = "UIP") -> LayerClassi
     return classify_layer(entity.layer_name, plan_type=plan_type)
 
 
-def classify_layers(layer_names: list[str], plan_type: str = "UIP") -> dict[str, LayerClassification]:
+def classify_layers(
+    layer_names: list[str], plan_type: str = "UIP"
+) -> dict[str, LayerClassification]:
     """Classify unique layer names while preserving the requested plan type."""
     return {name: classify_layer(name, plan_type=plan_type) for name in dict.fromkeys(layer_names)}
 
@@ -167,6 +177,7 @@ def classification_properties(classification: LayerClassification) -> dict[str, 
 
 
 def _clean_plan_type(plan_type: str | None) -> str | None:
+    """Return a valid EPLAN plan type for *plan_type*, or None."""
     if not plan_type:
         return None
     normalized = normalize_layer_name(plan_type, strip_known_prefixes=False)
@@ -178,6 +189,7 @@ def _find_style(
     plan_type: str,
     identity: TabakaIdentity | None,
 ) -> tuple[str, str, dict[str, Any] | None]:
+    """Resolve the (style key, plan type, style dict) for a layer, else empty values."""
     for candidate in _style_candidates(layer_name, identity):
         for resolved_plan_type in _PLAN_TYPE_FALLBACK.get(plan_type, ("UIP", "NIP", "CDP")):
             entry = EPLAN_CATALOG.get(resolved_plan_type, {}).get(candidate)
@@ -194,6 +206,7 @@ def _find_style(
 
 
 def _style_candidates(layer_name: str, identity: TabakaIdentity | None) -> list[str]:
+    """Build normalized catalog lookup keys from a layer name and its identity."""
     names = [layer_name]
     if identity:
         names.extend([identity.tabaka, identity.fonksiyon_adi])
@@ -211,6 +224,7 @@ def _style_candidates(layer_name: str, identity: TabakaIdentity | None) -> list[
 
 
 def _drop_prefixes(token: str) -> list[str]:
+    """Return *token* with each known leading CAD prefix stripped."""
     parts = token.split("_")
     if len(parts) <= 1:
         return []
@@ -224,6 +238,7 @@ def _drop_prefixes(token: str) -> list[str]:
 
 
 def _eplan_match_keys() -> list[tuple[tuple[str, ...], str]]:
+    """Return cached e-Plan catalog keys as (token tuple, key) pairs, longest first."""
     cached = getattr(_eplan_match_keys, "_cache", None)
     if cached is None:
         keys = set()
@@ -238,15 +253,17 @@ def _eplan_match_keys() -> list[tuple[tuple[str, ...], str]]:
 
 
 def _contains_subsequence(tokens: list[str], key_tokens: tuple[str, ...]) -> bool:
+    """Return True when *key_tokens* appears contiguously inside *tokens*."""
     if len(key_tokens) > len(tokens):
         return False
     for index in range(len(tokens) - len(key_tokens) + 1):
-        if tuple(tokens[index:index + len(key_tokens)]) == key_tokens:
+        if tuple(tokens[index : index + len(key_tokens)]) == key_tokens:
             return True
     return False
 
 
 def _identity_dict(identity: TabakaIdentity | None) -> dict[str, str] | None:
+    """Serialize a tabaka identity, or None when there is no identity."""
     if identity is None:
         return None
     return {

@@ -29,6 +29,7 @@ class GeoParquetExportResult:
     output_path: str
 
     def to_dict(self) -> dict[str, Any]:
+        """Return the GeoParquet export result as a JSON-serializable dictionary."""
         return {
             "feature_count": self.feature_count,
             "size_bytes": self.file_size_bytes,
@@ -46,10 +47,10 @@ def _encode_wkb_polygon(coords: Sequence[NetcadCoordinate]) -> bytes:
 
     # Little-endian (1), Type Polygon (3), 1 ring (int), num_points (int), points (double, double)
     wkb = bytearray()
-    wkb.extend(struct.pack("<B", 1))       # Byte order: 1 = Little Endian
-    wkb.extend(struct.pack("<I", 3))       # WKB Type: 3 = WKBPolygon
-    wkb.extend(struct.pack("<I", 1))       # Number of rings = 1 (exterior ring)
-    wkb.extend(struct.pack("<I", len(pts))) # Points count
+    wkb.extend(struct.pack("<B", 1))  # Byte order: 1 = Little Endian
+    wkb.extend(struct.pack("<I", 3))  # WKB Type: 3 = WKBPolygon
+    wkb.extend(struct.pack("<I", 1))  # Number of rings = 1 (exterior ring)
+    wkb.extend(struct.pack("<I", len(pts)))  # Points count
     for pt in pts:
         wkb.extend(struct.pack("<dd", pt.x, pt.y))
     return bytes(wkb)

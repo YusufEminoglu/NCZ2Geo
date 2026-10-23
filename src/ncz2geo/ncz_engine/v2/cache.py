@@ -13,6 +13,7 @@ swallowed and the caller simply rebuilds the index. Content is stored as
 JSON (never pickle) under a per-user cache directory. Invalidation is by a
 ``(size, mtime_ns)`` fingerprint plus a bumped :data:`CACHE_VERSION`.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -31,18 +32,22 @@ _DISABLE_ENV = "NCZ2GEO_NCZ_CACHE_DISABLE"
 
 
 def _cache_root() -> Path:
-    base = (os.environ.get("LOCALAPPDATA")
-            or os.environ.get("XDG_CACHE_HOME")
-            or os.path.join(os.path.expanduser("~"), ".cache"))
+    """Return the per-user directory that holds cached indexes."""
+    base = (
+        os.environ.get("LOCALAPPDATA")
+        or os.environ.get("XDG_CACHE_HOME")
+        or os.path.join(os.path.expanduser("~"), ".cache")
+    )
     return Path(base) / "ncz2geo" / "ncz_index"
 
 
 def _is_disabled() -> bool:
-    return os.environ.get(_DISABLE_ENV, "").strip().lower() in (
-        "1", "true", "yes")
+    """Return True when the cache is disabled via the environment."""
+    return os.environ.get(_DISABLE_ENV, "").strip().lower() in ("1", "true", "yes")
 
 
 def _cache_file(file_path: str) -> Path:
+    """Return the cache file path for *file_path*."""
     digest = hashlib.sha256(
         os.path.abspath(file_path).encode("utf-8", "surrogatepass")
     ).hexdigest()[:20]
@@ -50,6 +55,7 @@ def _cache_file(file_path: str) -> Path:
 
 
 def fingerprint(file_path: str) -> dict:
+    """Return the (size, mtime_ns) fingerprint used for cache invalidation."""
     stat = os.stat(file_path)
     return {"size": stat.st_size, "mtime_ns": stat.st_mtime_ns}
 
@@ -93,8 +99,9 @@ def load(file_path: str) -> dict | None:
     }
 
 
-def save(file_path: str, metadata: DrawingMetadata,
-         summaries: list[dict], attribute_tables: list[dict]) -> None:
+def save(
+    file_path: str, metadata: DrawingMetadata, summaries: list[dict], attribute_tables: list[dict]
+) -> None:
     """Persist a catalog for *file_path*. Silent on any failure."""
     if _is_disabled():
         return

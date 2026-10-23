@@ -64,7 +64,9 @@ class TestRounds2And3(unittest.TestCase):
         self.assertIn("<core:CityModel", citygml_file.read_text(encoding="utf-8"))
 
     def test_helmert_and_affine_transformations(self) -> None:
-        p = Helmert7Params(dx=10.0, dy=-5.0, dz=2.0, rx_arcsec=0.1, ry_arcsec=0.1, rz_arcsec=0.2, scale_ppm=1.0)
+        p = Helmert7Params(
+            dx=10.0, dy=-5.0, dz=2.0, rx_arcsec=0.1, ry_arcsec=0.1, rz_arcsec=0.2, scale_ppm=1.0
+        )
         nx, ny, nz = helmert_7parameter_transform(500000.0, 4500000.0, 100.0, p)
         self.assertNotEqual(nx, 500000.0)
         self.assertAlmostEqual(nz, 102.0, delta=5.0)
@@ -74,7 +76,9 @@ class TestRounds2And3(unittest.TestCase):
         self.assertEqual(ay, 45.0)
 
         res = parse_netcad(self.source)
-        transformed = transform_entities(res.entities, transformation_type="helmert", helmert_params=p)
+        transformed = transform_entities(
+            res.entities, transformation_type="helmert", helmert_params=p
+        )
         self.assertEqual(len(transformed), len(res.entities))
 
     def test_compare_plans_difference(self) -> None:
@@ -92,8 +96,24 @@ class TestRounds2And3(unittest.TestCase):
         table = NetcadAttributeTable(
             table_ref="@PARCEL",
             rows=[
-                NetcadAttributeRow(row_index=1, columns={"ADA": "101", "PARSEL": "5", "MALIK_ADI_SOYADI": "Ahmet Yilmaz", "TC_KIMLIK": "12345678901"}),
-                NetcadAttributeRow(row_index=2, columns={"ADA": "101", "PARSEL": "6", "MALIK_ADI_SOYADI": "Ayse Demir", "TC_KIMLIK": "98765432109"}),
+                NetcadAttributeRow(
+                    row_index=1,
+                    columns={
+                        "ADA": "101",
+                        "PARSEL": "5",
+                        "MALIK_ADI_SOYADI": "Ahmet Yilmaz",
+                        "TC_KIMLIK": "12345678901",
+                    },
+                ),
+                NetcadAttributeRow(
+                    row_index=2,
+                    columns={
+                        "ADA": "101",
+                        "PARSEL": "6",
+                        "MALIK_ADI_SOYADI": "Ayse Demir",
+                        "TC_KIMLIK": "98765432109",
+                    },
+                ),
             ],
         )
 

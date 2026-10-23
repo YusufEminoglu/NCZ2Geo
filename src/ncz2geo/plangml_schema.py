@@ -17,6 +17,7 @@ approximate answer: a plausible-looking code in a column reserved for the
 Ministry's codes is worse than an empty cell, because it survives export and
 looks authoritative.
 """
+
 from __future__ import annotations
 
 import re
@@ -25,10 +26,22 @@ from typing import Optional
 
 from .mpyy_catalog import MPYY_ALIASES, MPYY_TABAKA
 
-_TR_MAP = str.maketrans({
-    "Ç": "C", "Ğ": "G", "İ": "I", "Ö": "O", "Ş": "S", "Ü": "U",
-    "ç": "C", "ğ": "G", "ı": "I", "ö": "O", "ş": "S", "ü": "U",
-})
+_TR_MAP = str.maketrans(
+    {
+        "Ç": "C",
+        "Ğ": "G",
+        "İ": "I",
+        "Ö": "O",
+        "Ş": "S",
+        "Ü": "U",
+        "ç": "C",
+        "ğ": "G",
+        "ı": "I",
+        "ö": "O",
+        "ş": "S",
+        "ü": "U",
+    }
+)
 
 # Where a tabaka goes when the official catalog does not define one for it: CAD
 # helper layers, and local names with no unambiguous official counterpart. It is
@@ -41,13 +54,13 @@ UNCLASSIFIED_UPPER_GROUP = "DİĞER PLAN ALANLARI"
 class TabakaIdentity:
     """One tabaka as the official catalog defines it."""
 
-    tabaka: str                 # official tabaka name
-    ust_grup_id: str            # e.g. "112000"
-    ust_grup_adi: str           # e.g. "KONUT ALANLARI / YERLEŞİM ALANLARI"
-    fonksiyon_kodu: str         # e.g. "112002"
-    fonksiyon_adi: str          # e.g. "YERLEŞİK KONUT ALANI"
-    geometri: str               # "POLYGON" | "LINE"
-    matched_as: str             # "exact" | "alias"
+    tabaka: str  # official tabaka name
+    ust_grup_id: str  # e.g. "112000"
+    ust_grup_adi: str  # e.g. "KONUT ALANLARI / YERLEŞİM ALANLARI"
+    fonksiyon_kodu: str  # e.g. "112002"
+    fonksiyon_adi: str  # e.g. "YERLEŞİK KONUT ALANI"
+    geometri: str  # "POLYGON" | "LINE"
+    matched_as: str  # "exact" | "alias"
 
 
 def _normalize(name: Optional[str]) -> str:
@@ -58,7 +71,7 @@ def _normalize(name: Optional[str]) -> str:
     return re.sub(r"[^A-Z0-9]+", "_", text).strip("_")
 
 
-def _index():
+def _index() -> dict[str, str]:
     """Normalized catalog, built once."""
     cached = getattr(_index, "_cache", None)
     if cached is None:
@@ -67,11 +80,11 @@ def _index():
     return cached
 
 
-def _alias_index():
+def _alias_index() -> dict[str, str]:
+    """Normalized alias-to-official mapping, built once."""
     cached = getattr(_alias_index, "_cache", None)
     if cached is None:
-        cached = {_normalize(local): official
-                  for local, official in MPYY_ALIASES.items()}
+        cached = {_normalize(local): official for local, official in MPYY_ALIASES.items()}
         _alias_index._cache = cached
     return cached
 

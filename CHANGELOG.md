@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12.1] - 2026-10-23
+### Changed
+- Completed docstrings and type annotations across the public API and NCZ Engine v2 internals, with no runtime behavior changes.
+- Formatted `src` and `tests` with Ruff and resolved all lint findings.
+- Expanded the README with detailed installation steps, verified usage examples, a feature list, and a public API reference table.
+- Added edge-case and error-path tests for classification, validation, cadastral analysis, and the exporters.
+- Aligned build metadata (`setuptools` requirement for the SPDX license expression) and the coverage badge with the current codebase.
+
+### Added
+- High-resolution GEOPHILO CDN logos and GitLab repository telemetry in the generated documentation.
+
 ## [0.12.0] - 2026-08-30
 ### Added
 - **3D Cadastral Condominium & Strata Title Slicer (`cadastral_condominium_strata_slicer.py`)**: Added `slice_condominium_strata_units` generating 3D volumetric legal units (Kat Mülkiyeti) and calculating land ownership shares (Arsa Payı).

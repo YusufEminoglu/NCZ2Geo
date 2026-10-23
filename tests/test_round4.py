@@ -25,8 +25,20 @@ class TestNCZ2GeoRound4(unittest.TestCase):
             NetcadCoordinate(0.0, 0.0),
         ]
         entities = [
-            NetcadEntity(geometry_kind="POLYGON", layer_code=1, layer_name="PL_GELISME_KONUT", is_closed=True, coordinates=coords_res),
-            NetcadEntity(geometry_kind="POLYGON", layer_code=2, layer_name="PL_TICARET", is_closed=True, coordinates=coords_res),
+            NetcadEntity(
+                geometry_kind="POLYGON",
+                layer_code=1,
+                layer_name="PL_GELISME_KONUT",
+                is_closed=True,
+                coordinates=coords_res,
+            ),
+            NetcadEntity(
+                geometry_kind="POLYGON",
+                layer_code=2,
+                layer_name="PL_TICARET",
+                is_closed=True,
+                coordinates=coords_res,
+            ),
         ]
 
         report = calculate_zoning_capacity(entities, plan_type="UIP", default_emsal=1.80)
@@ -43,8 +55,8 @@ class TestNCZ2GeoRound4(unittest.TestCase):
         pts = [
             NetcadCoordinate(0.0, 0.0, 0.0),
             NetcadCoordinate(10.0, 0.1, 0.0),  # Minor jitter
-            NetcadCoordinate(20.0, -0.1, 0.0), # Minor jitter
-            NetcadCoordinate(30.0, 10.0, 0.0), # Major vertex
+            NetcadCoordinate(20.0, -0.1, 0.0),  # Minor jitter
+            NetcadCoordinate(30.0, 10.0, 0.0),  # Major vertex
             NetcadCoordinate(50.0, 10.0, 0.0),
         ]
 

@@ -44,7 +44,9 @@ class TestNCZ2GeoRound5(unittest.TestCase):
 
     def test_kml_kmz_exporter(self) -> None:
         cfg = KMLStyleConfig(line_color_abgr="ffff0000", extrude_3d=True, default_height_m=15.0)
-        res = export_to_kml_kmz([self.clean_entity], document_name="Istanbul Kadastro", style_config=cfg)
+        res = export_to_kml_kmz(
+            [self.clean_entity], document_name="Istanbul Kadastro", style_config=cfg
+        )
 
         self.assertIsInstance(res, KMLExportResult)
         self.assertEqual(res.feature_count, 1)

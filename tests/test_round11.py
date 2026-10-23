@@ -42,8 +42,20 @@ class TestNCZ2GeoRound11(unittest.TestCase):
     def test_geopackage_spatial_indexer(self) -> None:
         coords1 = [NetcadCoordinate(10.0, 10.0), NetcadCoordinate(20.0, 20.0)]
         coords2 = [NetcadCoordinate(100.0, 100.0), NetcadCoordinate(110.0, 110.0)]
-        ent1 = NetcadEntity(geometry_kind="LINESTRING", layer_code=1, layer_name="ROAD", is_closed=False, coordinates=coords1)
-        ent2 = NetcadEntity(geometry_kind="LINESTRING", layer_code=1, layer_name="ROAD", is_closed=False, coordinates=coords2)
+        ent1 = NetcadEntity(
+            geometry_kind="LINESTRING",
+            layer_code=1,
+            layer_name="ROAD",
+            is_closed=False,
+            coordinates=coords1,
+        )
+        ent2 = NetcadEntity(
+            geometry_kind="LINESTRING",
+            layer_code=1,
+            layer_name="ROAD",
+            is_closed=False,
+            coordinates=coords2,
+        )
 
         bbox_filter = RTreeBoundingBoxFilter(min_x=0.0, max_x=50.0, min_y=0.0, max_y=50.0)
         report = optimize_geopackage_spatial_rtree([ent1, ent2], test_query_bbox=bbox_filter)

@@ -28,7 +28,9 @@ class TestNCZ2GeoRound8(unittest.TestCase):
     def test_parcel_subdivision_optimizer(self) -> None:
         # 100m x 50m parent parcel (5000 m2)
         poly = [(0.0, 0.0), (100.0, 0.0), (100.0, 50.0), (0.0, 50.0), (0.0, 0.0)]
-        res = subdivide_cadastral_parcel(poly, target_lot_min_area_m2=800.0, min_frontage_width_m=15.0)
+        res = subdivide_cadastral_parcel(
+            poly, target_lot_min_area_m2=800.0, min_frontage_width_m=15.0
+        )
 
         self.assertIsInstance(res, ParcelSubdivisionResult)
         self.assertEqual(res.parent_area_m2, 5000.0)
