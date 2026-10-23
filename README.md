@@ -75,6 +75,29 @@ python -c "import ncz2geo; print(ncz2geo.__version__)"
 ncz2geo --version
 ```
 
+### Compatibility matrix
+
+| Component | Supported |
+| :--- | :--- |
+| Python | 3.9, 3.10, 3.11, 3.12, 3.13 |
+| Operating systems | Windows, macOS, Linux (pure Python) |
+| Input | Netcad `.ncz` / `.nca` drawings and `@TAB` attribute tables |
+| Output | GeoJSON, PlanGML GML, CityGML LoD, GeoPackage, FlatGeobuf, GeoParquet, GeoBuf, zipped GeoJSON, KML/KMZ, SLD/QML/Mapbox styles |
+| Runtime dependencies | None (the `[dev]` extra installs pytest, coverage, ruff, mypy, build and twine) |
+| Typing | Fully annotated public API with a bundled `py.typed` marker |
+
+### Troubleshooting
+
+| Symptom | Likely cause and fix |
+| :--- | :--- |
+| `FileNotFoundError` when parsing | Netcad paths are resolved from the process working directory. Convert with `Path(path).resolve()` first. |
+| A layer is exported as `DİĞER PLAN ALANLARI` | The local layer name has no unambiguous official UİP counterpart. Add an alias to `mpyy_catalog` or rename the CAD layer. |
+| `classification.identity is None` | No exact/alias catalog match was found. Check `classification.matched` before reading identity fields. |
+| Stale layer catalog after replacing a drawing | Remove cached catalog sidecars (or disable the cache) and re-run `.index()`. |
+| `UnicodeEncodeError` in the Windows console | Turkish characters and emoji need UTF-8: `set PYTHONUTF8=1` (PowerShell: `$env:PYTHONUTF8=1`). |
+| Large plans exhaust memory | Use `inspect_source()` / `NetcadReader.index()` and `decode_layers([...])` instead of a full `parse_netcad()`. |
+| GeoPackage writer reports `sqlite3` issues | GeoPackage output uses the standard-library `sqlite3` module; make sure the target file is not open in QGIS or another process. |
+
 ---
 
 ## 🚀 Quickstart & Python API

@@ -6,11 +6,22 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 from .ncz_engine.model import NetcadEntity
 from .plangml import classify_layer
 from .reader import parse_netcad
+
+
+class _PlanFeatureProps(TypedDict):
+    """Mutable comparison record for one feature while plans are matched."""
+
+    entity: NetcadEntity
+    area: float
+    cx: float
+    cy: float
+    fn: str
+    matched: bool
 
 
 @dataclass
@@ -92,7 +103,7 @@ def compare_plans(
     )
 
     # Compute centroids and properties
-    props1 = []
+    props1: list[_PlanFeatureProps] = []
     for e in entities1:
         if e.coordinates:
             area, cx, cy = _calc_area_and_centroid(e.coordinates)
@@ -102,7 +113,7 @@ def compare_plans(
                 {"entity": e, "area": area, "cx": cx, "cy": cy, "fn": fn_name, "matched": False}
             )
 
-    props2 = []
+    props2: list[_PlanFeatureProps] = []
     for e in entities2:
         if e.coordinates:
             area, cx, cy = _calc_area_and_centroid(e.coordinates)

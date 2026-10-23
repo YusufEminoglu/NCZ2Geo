@@ -187,8 +187,8 @@ def _style(args: argparse.Namespace) -> int:
         out = export_qml(layer_names, plan_type=args.plan_type)
         print(out)
     elif args.format == "mapbox":
-        out = export_mapbox_style(layer_names, plan_type=args.plan_type)
-        print(json.dumps(out, indent=2, ensure_ascii=False))
+        mapbox_style = export_mapbox_style(layer_names, plan_type=args.plan_type)
+        print(json.dumps(mapbox_style, indent=2, ensure_ascii=False))
     return 0
 
 

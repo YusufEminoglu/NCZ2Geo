@@ -49,6 +49,11 @@ _TR_MAP = str.maketrans(
 # layer tree never mixes official group names with near-identical invented ones.
 UNCLASSIFIED_UPPER_GROUP = "DİĞER PLAN ALANLARI"
 
+# Module-level memoisation guards. Using plain globals (rather than attributes
+# on the functions) keeps the caches visible to type checkers.
+_INDEX_CACHE: dict[str, str] | None = None
+_ALIAS_CACHE: dict[str, str] | None = None
+
 
 @dataclass(frozen=True)
 class TabakaIdentity:
@@ -73,20 +78,18 @@ def _normalize(name: Optional[str]) -> str:
 
 def _index() -> dict[str, str]:
     """Normalized catalog, built once."""
-    cached = getattr(_index, "_cache", None)
-    if cached is None:
-        cached = {_normalize(name): name for name in MPYY_TABAKA}
-        _index._cache = cached
-    return cached
+    global _INDEX_CACHE
+    if _INDEX_CACHE is None:
+        _INDEX_CACHE = {_normalize(name): name for name in MPYY_TABAKA}
+    return _INDEX_CACHE
 
 
 def _alias_index() -> dict[str, str]:
     """Normalized alias-to-official mapping, built once."""
-    cached = getattr(_alias_index, "_cache", None)
-    if cached is None:
-        cached = {_normalize(local): official for local, official in MPYY_ALIASES.items()}
-        _alias_index._cache = cached
-    return cached
+    global _ALIAS_CACHE
+    if _ALIAS_CACHE is None:
+        _ALIAS_CACHE = {_normalize(local): official for local, official in MPYY_ALIASES.items()}
+    return _ALIAS_CACHE
 
 
 def lookup_tabaka(name: Optional[str]) -> Optional[TabakaIdentity]:

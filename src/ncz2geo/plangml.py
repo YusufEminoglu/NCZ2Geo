@@ -35,6 +35,9 @@ _PLAN_TYPE_FALLBACK = {
     "CDP": ("CDP", "NIP", "UIP"),
 }
 
+# Cached, longest-first e-Plan match keys; populated by ``_eplan_match_keys``.
+_EPLAN_KEYS_CACHE: list[tuple[tuple[str, ...], str]] | None = None
+
 _PLAN_TYPE_WORDS = {
     "UIP": "UIP",
     "UYGULAMA": "UIP",
@@ -239,17 +242,16 @@ def _drop_prefixes(token: str) -> list[str]:
 
 def _eplan_match_keys() -> list[tuple[tuple[str, ...], str]]:
     """Return cached e-Plan catalog keys as (token tuple, key) pairs, longest first."""
-    cached = getattr(_eplan_match_keys, "_cache", None)
-    if cached is None:
-        keys = set()
+    global _EPLAN_KEYS_CACHE
+    if _EPLAN_KEYS_CACHE is None:
+        keys: set[str] = set()
         for entries in EPLAN_CATALOG.values():
             keys.update(entries)
-        cached = sorted(
+        _EPLAN_KEYS_CACHE = sorted(
             ((tuple(key.split("_")), key) for key in keys),
             key=lambda item: (-len(item[0]), -len(item[1])),
         )
-        _eplan_match_keys._cache = cached
-    return cached
+    return _EPLAN_KEYS_CACHE
 
 
 def _contains_subsequence(tokens: list[str], key_tokens: tuple[str, ...]) -> bool:

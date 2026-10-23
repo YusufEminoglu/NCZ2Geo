@@ -11,6 +11,7 @@ authors = [
 description = "Pure-Python parser & converter for Netcad NCZ files to GeoJSON, Shapefile, DXF, GeoPackage, FlatGeobuf, GeoParquet, GeoBuff, GeoZip, Strata Titles and GIS standards."
 readme = "README.md"
 license = "GPL-2.0-or-later"
+license-files = ["LICENSE"]
 requires-python = ">=3.9"
 keywords = [
     "netcad",

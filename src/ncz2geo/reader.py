@@ -15,6 +15,7 @@ from .ncz_engine.model import (
 )
 from .ncz_engine.v2 import PARSER_BACKEND_V2, NczCatalog
 from .ncz_engine.v2 import cache as ncz_cache
+from .ncz_engine.v2.blocks import DrawingMetadata
 from .ncz_engine.v2.parser import parse_file
 
 
@@ -60,7 +61,7 @@ class NetcadReader:
         self.backend = ""
         self.from_cache = False
         self._catalog: NczCatalog | None = None
-        self._metadata = None
+        self._metadata: DrawingMetadata | None = None
         self._summaries: list[LayerSummary] = []
         self._attribute_tables: list[dict] = []
 

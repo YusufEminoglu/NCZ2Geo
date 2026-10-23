@@ -190,8 +190,11 @@ def _rectangle_metrics(points: list[dict]) -> tuple[bool, float, float, float]:
     if not (_lengths_close(lengths[0], lengths[2]) and _lengths_close(lengths[1], lengths[3])):
         return False, 0.0, 0.0, 0.0
     for index in range(4):
-        a, b = edges[index], edges[(index + 1) % 4]
-        dot = abs((a[0] * b[0] + a[1] * b[1]) / (lengths[index] * lengths[(index + 1) % 4]))
+        edge_a, edge_b = edges[index], edges[(index + 1) % 4]
+        dot = abs(
+            (edge_a[0] * edge_b[0] + edge_a[1] * edge_b[1])
+            / (lengths[index] * lengths[(index + 1) % 4])
+        )
         if dot > 0.03:
             return False, 0.0, 0.0, 0.0
 

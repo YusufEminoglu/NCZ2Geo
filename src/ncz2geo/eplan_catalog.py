@@ -20,9 +20,11 @@ Copyright (C) 2026 Yusuf Eminoğlu
 SPDX-License-Identifier: GPL-2.0-or-later
 """
 
+from typing import Any
+
 EPLAN_PLAN_TYPES = ("UIP", "NIP", "CDP")
 
-EPLAN_CATALOG = {
+EPLAN_CATALOG: dict[str, dict[str, dict[str, Any]]] = {
     "CDP": {
         "AKARSU": {
             "label": "Akarsu",

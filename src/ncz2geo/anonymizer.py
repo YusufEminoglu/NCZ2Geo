@@ -68,11 +68,11 @@ def anonymize_ncz_attributes(
         cleaned_rows: list[NetcadAttributeRow] = []
         for row in table.rows:
             total_rows += 1
-            new_cols: dict[str, str] = {}
+            new_cols: dict[str, object] = {}
             for col_name, col_val in row.columns.items():
                 is_pii = any(re.search(pat, col_name, re.IGNORECASE) for pat in PII_COLUMN_PATTERNS)
                 if is_pii:
-                    new_cols[col_name] = mask_pii_value(col_val, salt=salt)
+                    new_cols[col_name] = mask_pii_value(str(col_val), salt=salt)
                     total_scrubbed += 1
                     scrubbed_cols_set.add(col_name)
                 else:

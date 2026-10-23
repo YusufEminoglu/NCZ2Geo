@@ -238,12 +238,16 @@ def validate_plan(
             )
 
         # Count entity per land use group
-        c = classifications.get(entity.layer_name)
-        if c and c.matched:
+        classification = classifications.get(entity.layer_name)
+        if classification and classification.matched:
             group = (
-                c.identity.ust_grup_adi
-                if c.identity and c.identity.ust_grup_adi
-                else (c.style.get("ust_grup", "DİĞER") if c.style else "DİĞER")
+                classification.identity.ust_grup_adi
+                if classification.identity and classification.identity.ust_grup_adi
+                else (
+                    classification.style.get("ust_grup", "DİĞER")
+                    if classification.style
+                    else "DİĞER"
+                )
             )
             land_use_breakdown[group] = land_use_breakdown.get(group, 0) + 1
 
