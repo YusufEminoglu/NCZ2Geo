@@ -8,9 +8,16 @@ import sys
 from pathlib import Path
 
 from . import __version__
+from ._crs import parse_epsg
+from .dxf_writer import export_entities_to_dxf
+from .flatgeobuf_writer import export_entities_to_flatgeobuf
 from .geojson import write_geojson
+from .geopackage_writer import export_entities_to_geopackage
+from .geoparquet_writer import export_entities_to_geoparquet
+from .kml_kmz_exporter import export_to_kml_kmz
 from .plangml import classify_layer
-from .reader import NetcadReader, parse_netcad
+from .reader import NetcadReader
+from .shapefile_writer import export_entities_to_shapefile
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -30,7 +37,9 @@ def build_parser() -> argparse.ArgumentParser:
     inspect_parser.add_argument("--json", action="store_true", help="Print machine-readable JSON.")
 
     convert_parser = subparsers.add_parser(
-        "convert", help="Convert an NCZ/NCA file to styled GeoJSON."
+        "convert",
+        help="Convert an NCZ/NCA file; the output extension picks the format "
+        "(.geojson, .gpkg, .fgb, .parquet, .shp, .dxf, .kml, .kmz).",
     )
     convert_parser.add_argument("source", type=Path)
     convert_parser.add_argument("output", type=Path)
@@ -38,6 +47,11 @@ def build_parser() -> argparse.ArgumentParser:
     convert_parser.add_argument(
         "--layers",
         help="Comma-separated layer codes to decode; defaults to all layers.",
+    )
+    convert_parser.add_argument(
+        "--srid",
+        type=int,
+        help="EPSG code of the drawing coordinates; defaults to the code stored in the drawing.",
     )
 
     val_parser = subparsers.add_parser("validate", help="Validate PlanGML and e-Plan compliance.")
@@ -131,17 +145,71 @@ def _inspect(args: argparse.Namespace) -> int:
     return 0
 
 
+_CONVERT_FORMATS = {
+    ".geojson": "GeoJSON",
+    ".json": "GeoJSON",
+    ".gpkg": "GeoPackage",
+    ".fgb": "FlatGeobuf",
+    ".parquet": "GeoParquet",
+    ".geoparquet": "GeoParquet",
+    ".shp": "Shapefile",
+    ".dxf": "DXF",
+    ".kml": "KML",
+    ".kmz": "KMZ",
+}
+
+
 def _convert(args: argparse.Namespace) -> int:
-    """Convert a drawing (or selected layers) to styled GeoJSON."""
+    """Convert a drawing (or selected layers) to the format named by the output extension."""
+    fmt = _CONVERT_FORMATS.get(args.output.suffix.lower())
+    if fmt is None:
+        supported = ", ".join(sorted(_CONVERT_FORMATS))
+        print(
+            f"Unsupported output extension '{args.output.suffix}'. Use one of: {supported}",
+            file=sys.stderr,
+        )
+        return 2
+    reader = NetcadReader(args.source).index()
     if args.layers:
         layer_codes = [int(part.strip()) for part in args.layers.split(",") if part.strip()]
-        reader = NetcadReader(args.source).index()
         entities = reader.decode_layers(layer_codes)
     else:
-        entities = parse_netcad(args.source).entities
-    collection = write_geojson(entities, args.output, plan_type=args.plan_type)
-    print(f"Wrote {len(collection['features'])} feature(s) to {args.output}")
+        entities = reader.parse().entities
+    srid = args.srid or parse_epsg(reader.epsg)
+    count = _write_format(fmt, entities, args.output, srid, args.plan_type)
+    crs = f" (EPSG:{srid})" if srid else ""
+    print(f"Wrote {count} feature(s) to {args.output} as {fmt}{crs}")
     return 0
+
+
+def _write_format(fmt: str, entities: list, output: Path, srid: int | None, plan_type: str) -> int:
+    """Write ``entities`` with the exporter for ``fmt`` and return the feature count."""
+    if fmt == "GeoJSON":
+        return len(write_geojson(entities, output, plan_type=plan_type, srid=srid)["features"])
+    if fmt == "GeoPackage":
+        return export_entities_to_geopackage(
+            entities, output, table_name=output.stem, srs_id=srid, plan_type=plan_type
+        ).total_features_written
+    if fmt == "FlatGeobuf":
+        return export_entities_to_flatgeobuf(
+            entities, output, srid=srid, plan_type=plan_type
+        ).feature_count
+    if fmt == "GeoParquet":
+        return export_entities_to_geoparquet(
+            entities, output, srid=srid, plan_type=plan_type
+        ).feature_count
+    if fmt == "Shapefile":
+        return export_entities_to_shapefile(
+            entities, output, srid=srid, plan_type=plan_type
+        ).feature_count
+    if fmt == "DXF":
+        return export_entities_to_dxf(entities, output, srid=srid, plan_type=plan_type).entity_count
+    result = export_to_kml_kmz(entities, document_name=output.stem, srid=srid, plan_type=plan_type)
+    if fmt == "KMZ":
+        result.save_kmz(output)
+    else:
+        result.save_kml(output)
+    return result.feature_count
 
 
 def _validate(args: argparse.Namespace) -> int:

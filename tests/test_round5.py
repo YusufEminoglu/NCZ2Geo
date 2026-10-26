@@ -44,8 +44,20 @@ class TestNCZ2GeoRound5(unittest.TestCase):
 
     def test_kml_kmz_exporter(self) -> None:
         cfg = KMLStyleConfig(line_color_abgr="ffff0000", extrude_3d=True, default_height_m=15.0)
+        # The parcel placed in TUREF / TM30 (EPSG:5254), as a real Netcad drawing would be.
+        tm30_parcel = NetcadEntity(
+            geometry_kind="POLYGON",
+            layer_name="PL_KONUT",
+            layer_code=1,
+            is_closed=True,
+            coordinates=[
+                NetcadCoordinate(c.x + 500000.0, c.y + 4500000.0, c.z) for c in self.clean_coords
+            ],
+        )
+        with self.assertRaises(ValueError):
+            export_to_kml_kmz([tm30_parcel])
         res = export_to_kml_kmz(
-            [self.clean_entity], document_name="Istanbul Kadastro", style_config=cfg
+            [tm30_parcel], document_name="Istanbul Kadastro", style_config=cfg, srid=5254
         )
 
         self.assertIsInstance(res, KMLExportResult)

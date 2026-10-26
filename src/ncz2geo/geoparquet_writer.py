@@ -1,15 +1,25 @@
 # -*- coding: utf-8 -*-
-"""Cloud-Native GeoParquet 1.1 Metadata & Binary WKB Vector Exporter for NCZ2Geo."""
+"""Cloud-Native GeoParquet 1.1 Exporter for NCZ2Geo.
+
+Writes a real Apache Parquet file (pure Python, no pyarrow) with a WKB
+``geometry`` column, one typed column per PlanGML/e-Plan attribute and the
+GeoParquet 1.1 ``geo`` file metadata. The result opens in GeoPandas, DuckDB,
+GDAL/OGR, QGIS and any Arrow-based reader.
+"""
 
 from __future__ import annotations
 
 import json
-import struct
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any, Optional, Sequence
 
-from ncz2geo.ncz_engine.model import NetcadCoordinate, NetcadEntity
+from ncz2geo._crs import projjson
+from ncz2geo._feature_table import BOOL, FLOAT, INT, build_feature_table, to_wkb
+from ncz2geo._parquet import BOOLEAN, BYTE_ARRAY, DOUBLE, INT64, Column, write_parquet
+from ncz2geo.ncz_engine.model import NetcadEntity
+
+_PHYSICAL = {BOOL: BOOLEAN, INT: INT64, FLOAT: DOUBLE}
 
 
 @dataclass
@@ -39,100 +49,80 @@ class GeoParquetExportResult:
         }
 
 
-def _encode_wkb_polygon(coords: Sequence[NetcadCoordinate]) -> bytes:
-    """Encode 2D Polygon into OGC Well-Known Binary (WKB) standard bytes."""
-    pts = list(coords)
-    if pts and pts[0] != pts[-1]:
-        pts.append(pts[0])
+def _crs_entry(srid: Optional[int], crs: Optional[dict[str, Any]]) -> tuple[bool, Any]:
+    """Return ``(include, value)`` for the GeoParquet ``crs`` member.
 
-    # Little-endian (1), Type Polygon (3), 1 ring (int), num_points (int), points (double, double)
-    wkb = bytearray()
-    wkb.extend(struct.pack("<B", 1))  # Byte order: 1 = Little Endian
-    wkb.extend(struct.pack("<I", 3))  # WKB Type: 3 = WKBPolygon
-    wkb.extend(struct.pack("<I", 1))  # Number of rings = 1 (exterior ring)
-    wkb.extend(struct.pack("<I", len(pts)))  # Points count
-    for pt in pts:
-        wkb.extend(struct.pack("<dd", pt.x, pt.y))
-    return bytes(wkb)
+    GeoParquet requires full PROJJSON; an absent ``crs`` means OGC:CRS84
+    (lon/lat), so EPSG:4326 data in lon/lat order is written without ``crs``.
+    Bundled EPSG codes (see :func:`ncz2geo._crs.supported_epsg_codes`) get their
+    PROJJSON; any other code is written as ``null`` (unknown) rather than as an
+    invalid partial definition. ``crs`` overrides all of this.
+    """
+    if crs is not None:
+        return True, crs
+    if srid and int(srid) == 4326:
+        return False, None
+    return True, projjson(srid)
 
 
 def export_entities_to_geoparquet(
     entities: Sequence[NetcadEntity],
     output_path: str | Path,
-    srid: int = 4326,
+    srid: Optional[int] = 4326,
+    *,
+    plan_type: str = "UIP",
+    crs: Optional[dict[str, Any]] = None,
 ) -> GeoParquetExportResult:
-    """Serialize Netcad entities into GeoParquet container with embedded GeoParquet 1.1 spec metadata."""
+    """Export Netcad entities to a GeoParquet 1.1 file.
+
+    Attributes are the same PlanGML/e-Plan properties as :func:`write_geojson`;
+    geometries are ISO WKB (with Z when any vertex has an elevation). ``srid`` is
+    the EPSG code of the coordinates (``None`` marks the CRS unknown); pass
+    ``crs`` to embed a full PROJJSON definition instead.
+    """
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
+    table = build_feature_table(entities, plan_type=plan_type)
 
-    min_x = float("inf")
-    min_y = float("inf")
-    max_x = float("-inf")
-    max_y = float("-inf")
+    columns = [
+        Column(
+            "geometry",
+            BYTE_ARRAY,
+            [to_wkb(f, table.has_z) for f in table.features],
+            nullable=False,
+        )
+    ]
+    for name, kind in table.columns:
+        columns.append(
+            Column(
+                name,
+                _PHYSICAL.get(kind, BYTE_ARRAY),
+                [f.properties[name] for f in table.features],
+                utf8=kind not in _PHYSICAL,
+            )
+        )
 
-    wkb_records: list[bytes] = []
-
-    for ent in entities:
-        if not ent.coordinates:
-            continue
-
-        xs = [c.x for c in ent.coordinates]
-        ys = [c.y for c in ent.coordinates]
-        min_x = min(min_x, min(xs))
-        min_y = min(min_y, min(ys))
-        max_x = max(max_x, max(xs))
-        max_y = max(max_y, max(ys))
-
-        wkb_bytes = _encode_wkb_polygon(ent.coordinates)
-        wkb_records.append(wkb_bytes)
-
-    if min_x == float("inf"):
-        min_x, min_y, max_x, max_y = 0.0, 0.0, 0.0, 0.0
-
-    bbox = [min_x, min_y, max_x, max_y]
-
-    # GeoParquet 1.1.0 JSON metadata payload
-    geo_meta = {
-        "version": "1.1.0",
-        "primary_column": "geometry",
-        "columns": {
-            "geometry": {
-                "encoding": "WKB",
-                "geometry_types": ["Polygon"],
-                "crs": {
-                    "$schema": "https://proj.org/schemas/v0.7/projjson.schema.json",
-                    "type": "GeographicCRS",
-                    "name": f"EPSG:{srid}",
-                },
-                "bbox": bbox,
-            }
-        },
+    bbox = list(table.bbox) if table.bbox else [0.0, 0.0, 0.0, 0.0]
+    suffix = " Z" if table.has_z else ""
+    geometry_meta: dict[str, Any] = {
+        "encoding": "WKB",
+        "geometry_types": [g + suffix for g in table.geometry_types],
     }
+    if table.bbox:
+        geometry_meta["bbox"] = bbox
+    include_crs, crs_value = _crs_entry(srid, crs)
+    if include_crs:
+        geometry_meta["crs"] = crs_value
+    meta = GeoParquetMetadata(columns={"geometry": geometry_meta})
+    geo = {"version": meta.version, "primary_column": meta.primary_column, "columns": meta.columns}
 
-    geo_meta_json = json.dumps(geo_meta).encode("utf-8")
-
-    # Write Parquet-like binary container with PAR1 magic and GeoParquet metadata footer
-    # Header: PAR1 (4 bytes)
-    # Body: Column chunks
-    # Footer: GeoParquet Metadata + Metadata Size (4 bytes) + PAR1 (4 bytes)
-    with open(out, "wb") as f:
-        f.write(b"PAR1")
-        # Write WKB record entries
-        for rec in wkb_records:
-            f.write(struct.pack("<I", len(rec)))
-            f.write(rec)
-        # Write metadata footer
-        f.write(geo_meta_json)
-        f.write(struct.pack("<I", len(geo_meta_json)))
-        f.write(b"PAR1")
-
-    file_sz = out.stat().st_size
+    write_parquet(str(out), columns, {"geo": json.dumps(geo, ensure_ascii=False)})
 
     return GeoParquetExportResult(
-        feature_count=len(wkb_records),
-        file_size_bytes=file_sz,
+        feature_count=len(table.features),
+        file_size_bytes=out.stat().st_size,
         geometry_column_name="geometry",
-        geoparquet_version="1.1.0",
+        geoparquet_version=meta.version,
         bounding_box=bbox,
         output_path=str(out),
     )

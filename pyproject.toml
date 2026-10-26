@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "NCZ2Geo"
-version = "0.12.2"
+version = "0.13.0"
 authors = [
     { name = "Yusuf Eminoğlu", email = "yusufeminoglu@gmail.com" }
 ]
-description = "Read Netcad NCZ/NCA files in pure Python and export them to GeoJSON, GeoPackage and KML/KMZ, with PlanGML / e-Plan layer classification."
+description = "Read Netcad NCZ/NCA files in pure Python and convert them to GeoJSON, GeoPackage, Shapefile, FlatGeobuf, GeoParquet, DXF and KML/KMZ."
 readme = "README.md"
 license = "GPL-2.0-or-later"
 license-files = ["LICENSE"]
@@ -27,6 +27,11 @@ keywords = [
     "geopackage",
     "kml",
     "kmz",
+    "shapefile",
+    "ncz-to-shapefile",
+    "dxf",
+    "flatgeobuf",
+    "geoparquet",
     "zoning",
     "cadastre",
     "turkey",
@@ -54,6 +59,7 @@ dev = [
     "mypy>=1.0.0",
     "build>=1.0.0",
     "twine>=5.0.0",
+    "pyarrow>=14.0.0",  # reads GeoParquet output back in the test suite
 ]
 
 [project.scripts]
@@ -74,7 +80,7 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-ncz2geo = ["py.typed"]
+ncz2geo = ["py.typed", "crs_definitions.json"]
 
 [tool.ruff]
 line-length = 100

@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Google Earth 3D Volumetric Extrusion and KMZ Exporter for NCZ2Geo."""
+"""Google Earth 3D Volumetric Extrusion and KMZ Exporter for NCZ2Geo.
+
+KML coordinates are always WGS 84 longitude/latitude. Netcad drawings are
+usually projected (e.g. TUREF / TM30, EPSG:5254), so pass ``srid`` and the
+exporter converts every vertex with :mod:`ncz2geo._projection` (sub-millimetre
+agreement with PROJ for the bundled Turkish CRSs).
+"""
 
 from __future__ import annotations
 
@@ -8,8 +14,10 @@ import io
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Sequence
+from typing import Optional, Sequence
 
+from ._feature_table import build_feature_table
+from ._projection import to_wgs84
 from .ncz_engine.model import NetcadEntity
 
 
@@ -48,55 +56,76 @@ def export_to_kml_kmz(
     entities: Sequence[NetcadEntity],
     document_name: str = "Netcad Cadastral Plan",
     style_config: KMLStyleConfig | None = None,
+    *,
+    srid: Optional[int] = None,
+    plan_type: str = "UIP",
 ) -> KMLExportResult:
-    """Convert NetCAD entities into standard OGC KML 2.2 and zipped KMZ format with 3D extrusions."""
+    """Convert NetCAD entities into standard OGC KML 2.2 and zipped KMZ format with 3D extrusions.
+
+    ``srid`` is the EPSG code of the drawing coordinates; they are converted to
+    WGS 84 lon/lat (``None`` or 4326 means they already are). Projected
+    coordinates without ``srid`` raise ``ValueError`` instead of producing a KML
+    that places the plan off the globe. Geometry types follow
+    :func:`write_geojson` (points, lines and polygons).
+    """
     cfg = style_config or KMLStyleConfig()
+    table = build_feature_table(entities, plan_type=plan_type)
+    if not srid or int(srid) == 4326:
+        for feature in table.features:
+            if any(abs(x) > 180 or abs(y) > 90 for x, y, _z in feature.vertices()):
+                raise ValueError(
+                    "coordinates are not longitude/latitude; pass srid=<EPSG code of the drawing>"
+                )
     placemarks: list[str] = []
     count = 0
 
-    for idx, ent in enumerate(entities):
-        if not ent.coordinates:
-            continue
+    def kml_coords(points: Sequence[tuple[float, float, float]], extrude: bool) -> str:
+        """Format vertices as ``lon,lat,alt`` tuples in WGS 84."""
+        out = []
+        for x, y, z in points:
+            lon, lat = to_wgs84(x, y, srid)
+            h = cfg.default_height_m if extrude else z
+            out.append(f"{lon:.8f},{lat:.8f},{h:.2f}")
+        return " ".join(out)
 
-        name = html.escape(ent.layer_name or f"Entity_{idx}")
-        desc = f"Layer: {name}<br>Geometry: {ent.geometry_kind}<br>Points: {len(ent.coordinates)}"
-
-        # Format coordinates as: lon,lat,altitude
-        coords_kml_list = []
-        for pt in ent.coordinates:
-            # NetCAD standard X=Easting(Lon), Y=Northing(Lat), Z=Elevation
-            h = cfg.default_height_m if cfg.extrude_3d else pt.z
-            coords_kml_list.append(f"{pt.x:.6f},{pt.y:.6f},{h:.2f}")
-
-        coords_str = " ".join(coords_kml_list)
-
-        if ent.geometry_kind in ("POLYGON", "PARCEL", "CLOSED_POLYLINE") or (
-            ent.is_closed and len(ent.coordinates) >= 3
-        ):
-            # Ensure closed ring
-            if ent.coordinates[0] != ent.coordinates[-1]:
-                coords_str += f" {coords_kml_list[0]}"
-
+    for idx, feature in enumerate(table.features):
+        props = feature.properties
+        layer = str(props.get("layer_name") or "")
+        name = html.escape(layer or f"Entity_{idx}")
+        desc = (
+            f"Layer: {name}<br>Geometry: {html.escape(str(props.get('geometry_kind')))}"
+            f"<br>Points: {len(feature.vertices())}"
+        )
+        if feature.geometry_type == "Polygon":
+            rings = [kml_coords(ring, cfg.extrude_3d) for ring in feature.coordinates]
+            inner = "".join(
+                f"""
+        <innerBoundaryIs>
+          <LinearRing>
+            <coordinates>{ring}</coordinates>
+          </LinearRing>
+        </innerBoundaryIs>"""
+                for ring in rings[1:]
+            )
             geom_xml = f"""      <Polygon>
         <extrude>{1 if cfg.extrude_3d else 0}</extrude>
         <altitudeMode>{cfg.altitude_mode}</altitudeMode>
         <outerBoundaryIs>
           <LinearRing>
-            <coordinates>{coords_str}</coordinates>
+            <coordinates>{rings[0]}</coordinates>
           </LinearRing>
-        </outerBoundaryIs>
+        </outerBoundaryIs>{inner}
       </Polygon>"""
-        elif ent.geometry_kind in ("POINT", "TEXT"):
-            pt0 = ent.coordinates[0]
+        elif feature.geometry_type == "Point":
             geom_xml = f"""      <Point>
         <altitudeMode>{cfg.altitude_mode}</altitudeMode>
-        <coordinates>{pt0.x:.6f},{pt0.y:.6f},{pt0.z:.2f}</coordinates>
+        <coordinates>{kml_coords(feature.coordinates, False)}</coordinates>
       </Point>"""
         else:
             geom_xml = f"""      <LineString>
         <extrude>{1 if cfg.extrude_3d else 0}</extrude>
         <altitudeMode>{cfg.altitude_mode}</altitudeMode>
-        <coordinates>{coords_str}</coordinates>
+        <coordinates>{kml_coords(feature.coordinates, cfg.extrude_3d)}</coordinates>
       </LineString>"""
 
         placemark_xml = f"""    <Placemark id="pm_{idx}">

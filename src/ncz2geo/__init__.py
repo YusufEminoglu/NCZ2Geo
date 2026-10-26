@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from ._crs import supported_epsg_codes
 from .anonymizer import (
     AnonymizationReport,
     anonymize_ncz_attributes,
@@ -27,6 +28,7 @@ from .cadastral_right_of_way_easement import (
     EasementParcelIntersection,
     generate_easement_corridor_slices,
 )
+from .dxf_writer import DxfExportResult, export_entities_to_dxf
 from .flatgeobuf_writer import (
     FlatGeobufExportResult,
     export_entities_to_flatgeobuf,
@@ -97,6 +99,7 @@ from .plangml import (
     normalize_layer_name,
 )
 from .reader import LayerSummary, NetcadReader, inspect_source, parse_netcad
+from .shapefile_writer import ShapefileExportResult, export_entities_to_shapefile
 from .simplifier import (
     douglas_peucker_3d,
     simplify_entities,
@@ -131,7 +134,7 @@ from .zoning_density import (
     calculate_zoning_capacity,
 )
 
-__version__ = "0.12.2"
+__version__ = "0.13.0"
 __author__ = "Yusuf Eminoğlu"
 
 __all__ = [
@@ -202,6 +205,11 @@ __all__ = [
     "BoundarySimplificationResult",
     # FlatGeobuf Exporter
     "export_entities_to_flatgeobuf",
+    "export_entities_to_shapefile",
+    "ShapefileExportResult",
+    "export_entities_to_dxf",
+    "DxfExportResult",
+    "supported_epsg_codes",
     "FlatGeobufExportResult",
     # Parcel Subdivision & Frontage Optimizer
     "subdivide_cadastral_parcel",

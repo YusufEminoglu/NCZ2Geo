@@ -5,6 +5,11 @@ standards:
 
 - e-Plan plan gösterimleri published through `https://eplan.csb.gov.tr/`
 - Mekansal Planlar Yapım Yönetmeliği / MPYY tabaka catalog data
+- `crs_definitions.json`: PROJJSON, OGC WKT1 and ESRI WKT definitions of 26
+  EPSG coordinate reference systems, generated with PROJ's `projinfo` from the
+  EPSG Geodetic Parameter Dataset (https://epsg.org, terms of use:
+  https://epsg.org/terms-of-use.html) as distributed with PROJ (MIT license).
+  The ED50 to WGS 84 parameters used for Turkey come from the same dataset.
 
 The catalog compiler, matching code, package structure, Netcad NCZ Engine v2
 reader, SDK API, CLI, and tests are authored for this package.

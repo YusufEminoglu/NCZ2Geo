@@ -37,9 +37,21 @@ def write_geojson(
     path: str | Path,
     *,
     plan_type: str = "UIP",
+    srid: int | None = None,
 ) -> dict:
-    """Write entities as styled GeoJSON and return the FeatureCollection."""
+    """Write entities as styled GeoJSON and return the FeatureCollection.
+
+    RFC 7946 GeoJSON is WGS 84 by definition, but Netcad drawings are usually
+    projected. Pass ``srid`` (e.g. 5254) to add the GeoJSON 2008 ``crs`` member,
+    which GDAL and QGIS read, so the plan lands in the right place.
+    """
     collection = entities_to_feature_collection(entities, plan_type=plan_type)
+    if srid and int(srid) != 4326:
+        collection = {
+            "type": "FeatureCollection",
+            "crs": {"type": "name", "properties": {"name": f"urn:ogc:def:crs:EPSG::{int(srid)}"}},
+            "features": collection["features"],
+        }
     out_path = Path(path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(
@@ -55,7 +67,9 @@ def _entity_geometry(entity: NetcadEntity) -> dict | None:
     kind = entity.geometry_kind.lower()
     if not coords:
         return None
-    if kind in {"point", "symbol", "text", "smartobject"}:
+    # A single vertex is a point whatever the kind: circles carry only their centre
+    # (the radius stays in the properties), and a one-position LineString is invalid.
+    if kind in {"point", "symbol", "text", "smartobject"} or len(coords) == 1:
         return {"type": "Point", "coordinates": coords[0]}
     if kind in {"polygon", "rectangle", "circle"} or entity.is_closed:
         ring = coords[:]
@@ -64,8 +78,6 @@ def _entity_geometry(entity: NetcadEntity) -> dict | None:
         if len(ring) < 4:
             return {"type": "LineString", "coordinates": coords}
         return {"type": "Polygon", "coordinates": [ring]}
-    if len(coords) == 1:
-        return {"type": "Point", "coordinates": coords[0]}
     return {"type": "LineString", "coordinates": coords}
 
 

@@ -14,7 +14,7 @@
 [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-D7FF64.svg)](https://docs.astral.sh/ruff/)
 [![Test Coverage](https://img.shields.io/badge/coverage-92%25-brightgreen.svg)](#-development--testing)
 
-**Read Netcad NCZ/NCA files in pure Python and export them to GeoJSON, GeoPackage and KML/KMZ, with PlanGML / e-Plan layer classification.**
+**Read Netcad NCZ/NCA files in pure Python and convert them to GeoJSON, GeoPackage, Shapefile, FlatGeobuf, GeoParquet, DXF and KML/KMZ, with PlanGML / e-Plan layer classification and correct CRS metadata.**
 
 [📖 **Open Interactive Web Manual**](https://geophilo.com/NCZ2Geo/) • [📦 **PyPI Package**](https://pypi.org/project/NCZ2Geo/) • [🐙 **GitHub**](https://github.com/YusufEminoglu/NCZ2Geo) • [🐛 **Issue Tracker**](https://github.com/YusufEminoglu/NCZ2Geo/issues)
 
@@ -33,30 +33,36 @@ Requires **Python 3.9 or newer**. There are no third-party runtime dependencies.
 ## ⚡ Quickstart
 
 ```python
-from ncz2geo import export_entities_to_geopackage, parse_netcad, write_geojson
+from ncz2geo import (
+    export_entities_to_flatgeobuf, export_entities_to_geopackage, export_entities_to_geoparquet,
+    export_entities_to_shapefile, export_to_kml_kmz, parse_netcad, write_geojson,
+)
 
-# Decode a Netcad drawing (no Netcad installation needed)
-result = parse_netcad("plan.ncz")
-print(len(result.entities), "entities in layers", result.layer_names)
+result = parse_netcad("plan.ncz")              # no Netcad installation needed
+srid = 5254                                    # TUREF / TM30; the drawing stores it in result.epsg
+print(len(result.entities), "entities,", result.epsg, "layers", result.layer_names)
 
-# GeoJSON enriched with PlanGML / e-Plan attributes
-collection = write_geojson(result.entities, "plan.geojson", plan_type="UIP")
-print(len(collection["features"]), "features -> plan.geojson")
+write_geojson(result.entities, "plan.geojson")                       # + PlanGML / e-Plan attributes
+export_entities_to_geopackage(result.entities, "plan.gpkg", srs_id=srid)
+shp = export_entities_to_shapefile(result.entities, "plan.shp", srid=srid)
+export_entities_to_flatgeobuf(result.entities, "plan.fgb", srid=srid)
+export_entities_to_geoparquet(result.entities, "plan.parquet", srid=srid)
+export_to_kml_kmz(result.entities, srid=srid).save_kmz("plan.kmz")  # converted to WGS 84
+print(shp.feature_counts)
 
-# Same entities as a GeoPackage
-gpkg = export_entities_to_geopackage(result.entities, "plan.gpkg")
-print(gpkg.total_features_written, "features -> plan.gpkg")
-
-# 15 entities in layers ['ROADS', 'PARCELS', 'TEXT', 'TRIANGLES', 'MISC']
-# 15 features -> plan.geojson
-# 15 features -> plan.gpkg
+# 15 entities, EPSG:5254 layers ['ROADS', 'PARCELS', 'TEXT', 'TRIANGLES', 'MISC']
+# {'Point': 8, 'LineString': 3, 'Polygon': 4}   (plan_points/_lines/_polygons.shp)
 ```
 
-Same from the shell: `ncz2geo inspect plan.ncz` and `ncz2geo convert plan.ncz plan.geojson`.
+Same from the shell — the output extension picks the format and the CRS is read from the drawing:
+
+```bash
+ncz2geo convert plan.ncz plan.shp      # also .geojson .gpkg .fgb .parquet .dxf .kml .kmz
+```
 
 ## 🇹🇷 Türkçe Özet
 
-**NCZ2Geo**, Netcad `.ncz` / `.nca` imar planı çizimlerini saf Python ile okur ve GeoJSON, GeoPackage ve KML/KMZ formatlarına dönüştürür. Netcad kurulumu gerekmez, ek bir kütüphane de istemez.
+**NCZ2Geo**, Netcad `.ncz` / `.nca` imar planı çizimlerini saf Python ile okur ve GeoJSON, GeoPackage, Shapefile, FlatGeobuf, GeoParquet, DXF ve KML/KMZ formatlarına dönüştürür. Netcad, GDAL veya QGIS kurulumu gerekmez. Koordinat sistemi (TUREF/ITRF96 ve ED50 TM dilimleri, UTM) dosyalara doğru yazılır; KML çıktısı WGS 84'e dönüştürülür. Komut satırından: `ncz2geo convert plan.ncz plan.shp`.
 Katman adlarını PlanGML / MPYY tabakalarıyla eşleştirir, e-Plan renklerini ekler ve planın mevzuata uygunluğunu raporlayabilir.
 
 ```bash
@@ -84,7 +90,8 @@ Built entirely on the high-speed **NCZ Engine v2** core, **NCZ2Geo** operates 10
 - **PlanGML-aware GeoJSON** — exports `FeatureCollection` documents enriched with PlanGML and e-Plan properties.
 - **Compliance validation** — checks classification coverage, mandatory layers, geometry integrity, and produces JSON/Markdown reports.
 - **Plan comparison** — detects added, removed, reclassified, and modified zoning features between two plan versions.
-- **Multi-format exporters** — GeoPackage, FlatGeobuf, GeoParquet, GeoBuff, GeoZip, KML/KMZ, PlanGML GML, and CityGML LoD.
+- **Multi-format exporters** — GeoPackage 1.2 (with R-tree spatial index), ESRI Shapefile, FlatGeobuf (with packed Hilbert R-tree index), GeoParquet 1.1, DXF R12 and KML/KMZ, all in pure Python and checked against GDAL/OGR, plus PlanGML GML, CityGML LoD, zipped GeoJSON (GeoZip) and NCZ2Geo's own compact GeoBuff format.
+- **CRS metadata built in** — complete definitions for TUREF and ED50 3° TM zones, UTM 35N–38N, WGS 84 and Web Mercator (`supported_epsg_codes()`); KML output is reprojected to WGS 84 (agrees with PROJ to under a millimetre in Turkey).
 - **Cadastral analysis tools** — zoning capacity (TAKS/KAKS), boundary simplification, parcel subdivision, easements, boundary disputes, strata titles, land consolidation, and R-Tree index planning.
 - **Privacy tooling** — KVKK/GDPR-aware pseudonymization of cadastral attribute tables.
 - **Coordinate transformations** — Helmert 7-parameter datum shifts and 2D affine transforms.
@@ -119,8 +126,8 @@ ncz2geo --version
 | Python | 3.9, 3.10, 3.11, 3.12, 3.13 |
 | Operating systems | Windows, macOS, Linux (pure Python) |
 | Input | Netcad `.ncz` / `.nca` drawings and `@TAB` attribute tables |
-| Output | GeoJSON, PlanGML GML, CityGML LoD, GeoPackage, FlatGeobuf, GeoParquet, GeoBuf, zipped GeoJSON, KML/KMZ, SLD/QML/Mapbox styles |
-| Runtime dependencies | None (the `[dev]` extra installs pytest, coverage, ruff, mypy, build and twine) |
+| Output | GeoJSON, GeoPackage, ESRI Shapefile, FlatGeobuf, GeoParquet, DXF R12, KML/KMZ, PlanGML GML, CityGML LoD, zipped GeoJSON, GeoBuff (NCZ2Geo's own binary format), SLD/QML/Mapbox styles |
+| Runtime dependencies | None (the `[dev]` extra installs pytest, coverage, ruff, mypy, build, twine and pyarrow) |
 | Typing | Fully annotated public API with a bundled `py.typed` marker |
 
 ### Troubleshooting
@@ -241,7 +248,8 @@ export_entities_to_geopackage(result.entities, "imar_plani.gpkg")
 from ncz2geo import export_to_kml_kmz, parse_netcad
 
 result = parse_netcad("kadastro.ncz")
-kml_result = export_to_kml_kmz(result.entities, document_name="Kadastro Planı")
+# KML is always WGS 84: pass the drawing's EPSG code (here TUREF / TM30) to reproject.
+kml_result = export_to_kml_kmz(result.entities, document_name="Kadastro Planı", srid=5254)
 
 kml_result.save_kml("kadastro.kml")
 kml_result.save_kmz("kadastro.kmz")
@@ -276,6 +284,11 @@ ncz2geo convert imar_plani.ncz imar_plani.geojson --plan-type UIP
 
 # 4. Convert specific layer codes only
 ncz2geo convert imar_plani.ncz konut_alanlari.geojson --layers 1,4,7 --plan-type UIP
+
+# 4b. Other formats: the output extension picks the writer; --srid overrides the drawing's EPSG
+ncz2geo convert imar_plani.ncz imar_plani.gpkg
+ncz2geo convert imar_plani.ncz imar_plani.shp      # imar_plani_points/_lines/_polygons.shp
+ncz2geo convert imar_plani.ncz imar_plani.kmz --srid 5254
 
 # 5. Validate a plan and emit a machine-readable compliance report
 ncz2geo validate imar_plani.ncz --plan-type UIP --json
@@ -376,12 +389,15 @@ The package exports the following public names from `ncz2geo`. `ncz2geo.__versio
 
 | API | Description |
 | :--- | :--- |
-| `export_entities_to_geopackage(entities, path, ...)` | Write an OGC GeoPackage SQLite database. |
-| `export_entities_to_flatgeobuf(entities, path, ...)` | Write a FlatGeobuf file with bounding-box headers. |
-| `export_entities_to_geoparquet(entities, path, ...)` | Write a GeoParquet container with 1.1 metadata. |
+| `export_entities_to_geopackage(entities, path, table_name=..., srs_id=5254)` | Write an OGC GeoPackage 1.2 (all geometry types, all attributes, R-tree index). |
+| `export_entities_to_shapefile(entities, path, srid=None)` | Write `<name>_points/_lines/_polygons.shp` with `.dbf`, UTF-8 `.cpg` and `.prj`. |
+| `export_entities_to_flatgeobuf(entities, path, srid=4326, index_node_size=16)` | Write a FlatGeobuf file with a packed Hilbert R-tree index. |
+| `export_entities_to_geoparquet(entities, path, srid=4326, crs=None)` | Write a GeoParquet 1.1 file (WKB geometry, PROJJSON CRS). |
+| `export_entities_to_dxf(entities, path)` | Write an ASCII DXF R12 drawing (layers, points, text, 2D/3D polylines). |
+| `supported_epsg_codes()` | EPSG codes with bundled CRS definitions. |
 | `export_entities_to_geobuff(entities, path, ...)` | Write the compact GeoBuff binary format. |
 | `create_geozip_spatial_archive(entities, path, ...)` | Bundle GeoJSON and a manifest into a GeoZip archive. |
-| `export_to_kml_kmz(entities, document_name=..., ...)` | Build KML 2.2 and zipped KMZ output. |
+| `export_to_kml_kmz(entities, document_name=..., srid=...)` | Build KML 2.2 / KMZ output reprojected to WGS 84. |
 
 ### Validation, comparison, and privacy
 
@@ -470,7 +486,7 @@ If you use **NCZ2Geo** in urban planning studies, cadastral automation pipelines
   title     = {{NCZ2Geo: Pure-Python Netcad NCZ/NCA Reader with PlanGML Identity and e-Plan Symbology Metadata}},
   year      = {2026},
   publisher = {PyPI - Python Package Index},
-  version   = {0.12.2},
+  version   = {0.13.0},
   url       = {https://gitlab.com/geospacephilo/NCZ2Geo}
 }
 ```

@@ -4,8 +4,48 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [0.12.2] - 2026-10-26
+## [0.13.0] - 2026-10-26
+### Added
+- **ESRI Shapefile export** (`export_entities_to_shapefile`): one shapefile per geometry type
+  (`_points`, `_lines`, `_polygons`), PointZ/PolyLineZ/PolygonZ when the drawing has elevations,
+  clockwise exterior rings, all PlanGML/e-Plan attributes under 10-character dBase names
+  (`result.field_names`), UTF-8 `.cpg` and an ESRI `.prj`.
+- **DXF export** (`export_entities_to_dxf`): ASCII DXF R12 with the Netcad layers, POINT, TEXT
+  (height, rotation) and 2D/3D POLYLINE entities, Turkish ANSI_1254 code page.
+- **Bundled CRS definitions** for TUREF and ED50 3° TM zones, UTM 35N–38N, WGS 84 and Web
+  Mercator (PROJJSON, OGC WKT1, ESRI WKT; `supported_epsg_codes()`), generated from PROJ.
+- **`ncz2geo convert` writes any format**: the output extension picks GeoJSON, GeoPackage,
+  Shapefile, FlatGeobuf, GeoParquet, DXF, KML or KMZ, and the CRS defaults to the EPSG code
+  stored in the drawing (`--srid` overrides it).
+- `write_geojson(..., srid=...)` adds the GeoJSON 2008 `crs` member for projected drawings,
+  so GDAL/QGIS place the plan correctly instead of assuming WGS 84 (the CLI passes it).
+
+### Changed
+- **FlatGeobuf is now the real format.** The previous writer produced a custom container that
+  GDAL rejected ("Header failed consistency verification"). The new writer emits FlatGeobuf v3:
+  FlatBuffers header with typed columns and EPSG CRS, a packed Hilbert R-tree index (node size
+  16, or `index_node_size=0` for none) and FlatBuffers features with Z.
+- **GeoParquet is now a real Parquet file.** The previous "Parquet-like" container could not be
+  opened by any Parquet reader. The new pure-Python writer produces a single-row-group Parquet
+  file with a WKB `geometry` column, typed attribute columns and GeoParquet 1.1 `geo` metadata
+  with full PROJJSON (previously every CRS was labelled a GeographicCRS).
+- **GeoPackage rewritten to the 1.2 specification**: points, lines and polygons are stored as
+  such (everything used to be written as a POLYGON), all attributes are kept, the CRS gets its
+  real WKT instead of a `PROJCS[...]` placeholder, the required SRS rows and `application_id`
+  are present, and a `gpkg_rtree_index` spatial index with its triggers is built.
+- **KML/KMZ coordinates are reprojected to WGS 84** via the new `srid` argument (inverse
+  Transverse Mercator plus the EPSG ED50→WGS 84 Helmert for Turkey; under 1 mm from PROJ).
+  Projected coordinates without `srid` now raise `ValueError` instead of producing a KML that
+  places the plan off the globe. Points and text are written as `<Point>` again (they were
+  emitted as one-vertex LineStrings because the geometry kinds were compared in upper case).
+- All binary exporters share one feature table, so they carry exactly the geometry and
+  attributes of `write_geojson`. Every format was checked against GDAL 3.13 (ogrinfo/ogr2ogr,
+  `validate_gpkg.py`), and GeoParquet additionally against pyarrow and DuckDB.
+- PyPI metadata: a plain-language summary, search keywords that match what users look for, and a working issue tracker link (GitHub issues; the GitLab issues page returned 404).
+
 ### Fixed
+- GeoJSON: a single-vertex entity (e.g. a circle, which carries only its centre) was written as
+  a one-position LineString, which is invalid GeoJSON; it is now a Point.
 - NCZ Engine v2 decoders no longer leak `NaN`/`inf` from corrupt or unexpected field values
   into decoded entities. A non-finite box rotation used to turn every ring corner into `NaN`
   (written as invalid JSON by the GeoJSON exporters), and smart-object sizes, circle/arc
@@ -33,9 +73,6 @@ All notable changes to this project will be documented in this file.
   function names such as `TİCARET ALANI` and `PASİF YEŞİL ALAN` are classified as commercial
   and green (they fell through to the generic branch); office layers match `OFIS` (was the
   misspelt `OFIZ`).
-
-### Changed
-- PyPI metadata: a plain-language summary, search keywords that match what users look for, and a working issue tracker link (GitHub issues; the GitLab issues page returned 404).
 
 ## [0.12.1] - 2026-10-23
 ### Changed
