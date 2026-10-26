@@ -9,6 +9,8 @@ from typing import Any, Iterable
 from .ncz_engine.model import NetcadEntity
 from .plangml import classify_layer
 
+_TURKISH_FOLD = str.maketrans("İŞĞÜÖÇ", "ISGUOC")
+
 
 @dataclass
 class ParcelCapacityItem:
@@ -97,10 +99,13 @@ def calculate_zoning_capacity(
         c = classify_layer(e.layer_name, plan_type=plan_type)
         fn_name = c.identity.fonksiyon_adi if c.identity else e.layer_name
         upper_fn = fn_name.upper()
+        # Catalog function names are Turkish ("TİCARET ALANI", "PASİF YEŞİL
+        # ALAN"); fold them to ASCII so the keyword tests below can match.
+        ascii_fn = upper_fn.translate(_TURKISH_FOLD)
 
         is_residential = "KONUT" in upper_fn or "GELISME" in upper_fn or "MESKEN" in upper_fn
-        is_commercial = "TICARET" in upper_fn or "TURIZM" in upper_fn or "OFIZ" in upper_fn
-        is_green = "PARK" in upper_fn or "YESIL" in upper_fn or "REKREASYON" in upper_fn
+        is_commercial = "TICARET" in ascii_fn or "TURIZM" in ascii_fn or "OFIS" in ascii_fn
+        is_green = "PARK" in ascii_fn or "YESIL" in ascii_fn or "REKREASYON" in ascii_fn
         is_road = (
             "YOL" in upper_fn or "SOKAK" in upper_fn or "CADDE" in upper_fn or "MEYDAN" in upper_fn
         )

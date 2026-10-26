@@ -43,6 +43,10 @@ def find_attribute_markers(cursor: Cursor) -> list[AttributeMarker]:
         end = found + 4
         while end < cursor.size and 48 <= cursor.u8(end) <= 57:
             end += 1
+        if end == found + 4:
+            # "@TAB" not followed by digits (e.g. text "@TABLE") is no marker.
+            position = end
+            continue
         table_ref = cursor.raw(found, end - found).decode("ascii", errors="ignore")
         record_start = found
         ref_length = end - found

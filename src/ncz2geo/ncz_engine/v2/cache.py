@@ -80,6 +80,8 @@ def load(file_path: str) -> dict | None:
     except (OSError, ValueError):
         return None
 
+    if not isinstance(stored, dict):
+        return None
     if stored.get("cache_version") != CACHE_VERSION:
         return None
     if stored.get("fingerprint") != current:
@@ -89,7 +91,11 @@ def load(file_path: str) -> dict | None:
         metadata = DrawingMetadata.from_dict(stored["metadata"])
         summaries = list(stored["summaries"])
         attribute_tables = stored.get("attribute_tables", [])
-    except (KeyError, TypeError):
+    except (KeyError, TypeError, AttributeError):
+        return None
+    if not isinstance(attribute_tables, list) or not all(
+        isinstance(item, dict) for item in summaries + attribute_tables
+    ):
         return None
 
     return {
@@ -120,12 +126,17 @@ def save(
     }
 
     cache_file = _cache_file(file_path)
-    with suppress(OSError, TypeError, ValueError):
+    tmp = cache_file.with_suffix(".json.tmp")
+    try:
         cache_file.parent.mkdir(parents=True, exist_ok=True)
-        tmp = cache_file.with_suffix(".json.tmp")
         with open(tmp, "w", encoding="utf-8") as handle:
             json.dump(payload, handle, ensure_ascii=False)
         os.replace(tmp, cache_file)
+    except (OSError, TypeError, ValueError):
+        # Never leave a half-written temp file behind (clear() only
+        # removes *.json, so an orphaned *.json.tmp would linger forever).
+        with suppress(OSError):
+            tmp.unlink()
 
 
 def clear() -> int:

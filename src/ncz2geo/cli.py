@@ -62,6 +62,7 @@ def main(argv: list[str] | None = None) -> int:
     """Dispatch the requested subcommand and return its exit code."""
     parser = build_parser()
     args = parser.parse_args(argv)
+    _tolerate_unencodable_output()
     if args.command == "inspect":
         return _inspect(args)
     if args.command == "convert":
@@ -190,6 +191,17 @@ def _style(args: argparse.Namespace) -> int:
         mapbox_style = export_mapbox_style(layer_names, plan_type=args.plan_type)
         print(json.dumps(mapbox_style, indent=2, ensure_ascii=False))
     return 0
+
+
+def _tolerate_unencodable_output() -> None:
+    """Replace characters stdout cannot encode instead of crashing.
+
+    Redirected output on Windows uses the ANSI code page (e.g. cp1254), which
+    cannot represent every decoded layer name or report symbol.
+    """
+    reconfigure = getattr(sys.stdout, "reconfigure", None)
+    if callable(reconfigure):
+        reconfigure(errors="replace")
 
 
 if __name__ == "__main__":

@@ -10,6 +10,27 @@ All notable changes to this project will be documented in this file.
   radii and angles, and text/symbol/block rotations could carry `NaN`/`Infinity`. Such
   scalars now fall back to `0`, smart objects use their corner-point size, and polyline
   vertices with non-finite coordinates are skipped.
+- NCZ Engine v2: an `@TAB` not followed by digits (for example the text `@TABLE`) is no longer
+  taken as an attribute-table marker; it used to create a bogus table and truncate the
+  preceding real record.
+- NCZ Engine v2: a geometry record nested in a container block is now indexed when it ends
+  exactly at the container's last byte (an off-by-one bound skipped it).
+- NCZ Engine v2: an unterminated `SRS:"EPSG:..."` value in a `TILED_XML` block is read only to
+  the end of its block and stops at NUL padding, instead of running on through the rest of the
+  file and returning padding and the next blocks' bytes as the EPSG code.
+- NCZ Engine v2: open polylines no longer report rectangle `box_width`/`box_height`/rotation
+  when their cyclic vertex list happens to reduce to four corners; only closed rings do.
+- NCZ index cache: a cache file holding well-formed JSON of the wrong shape (non-object
+  document, non-object metadata, non-object summaries or tables) is now a cache miss instead
+  of an `AttributeError` or a crash later in the reader, and a failed save no longer leaves an
+  orphaned `*.json.tmp` file behind.
+- `ncz2geo` CLI: output redirected to a file on Windows (ANSI code page) no longer aborts
+  with `UnicodeEncodeError` on characters the encoding cannot represent (layer names, the
+  validation report's status symbols); they are replaced instead.
+- `calculate_zoning_capacity` folds Turkish letters before keyword matching, so catalog
+  function names such as `TİCARET ALANI` and `PASİF YEŞİL ALAN` are classified as commercial
+  and green (they fell through to the generic branch); office layers match `OFIS` (was the
+  misspelt `OFIZ`).
 
 ## [0.12.1] - 2026-10-23
 ### Changed

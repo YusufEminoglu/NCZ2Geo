@@ -58,7 +58,7 @@ def scan_embedded_geometry(cursor: Cursor, container: RawBlock) -> Iterator[RawB
     length whose bytes at +5 and +6 are equal (length-prefix echo).
     """
     position = container.offset + 5
-    end = container.offset + container.size
+    end = container.end
     while position + 6 < end:
         if cursor.u8(position) not in GEOMETRY_BLOCK_KINDS or cursor.u8(position + 5) != cursor.u8(
             position + 6
@@ -198,8 +198,11 @@ def _read_epsg(cursor: Cursor, base: int, max_length: int) -> str:
             continue
         chars = []
         position = start
-        while position < cursor.size and cursor.u8(position) != 62:  # ">"
-            chars.append(cursor.text(position, 1) or "\0")
+        # Stay inside the block: an unterminated value must not swallow the
+        # following blocks' bytes. NUL padding also ends the value.
+        limit = min(cursor.size, base + max_length)
+        while position < limit and cursor.u8(position) not in (0, 62):  # NUL, ">"
+            chars.append(cursor.text(position, 1))
             position += 1
         return "".join(chars).replace("SRS:", "").replace('"', "")
     return ""

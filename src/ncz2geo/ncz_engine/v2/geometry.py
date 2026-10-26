@@ -408,7 +408,11 @@ def decode_polyline(record: GeometryRecord) -> dict | None:
     if closed and not _points_equal(points[0], points[-1]):
         points.append(dict(points[0]))
 
-    is_rect, width, height, rotation = _rectangle_metrics(points)
+    # Rectangle metrics only describe a closed ring; an open polyline whose
+    # cyclic vertex list happens to reduce to four corners is no rectangle.
+    is_rect, width, height, rotation = (
+        _rectangle_metrics(points) if closed else (False, 0.0, 0.0, 0.0)
+    )
     return _entity(
         record,
         "Polygon" if closed else "Polyline",
