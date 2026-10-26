@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: "Eminoğlu"
+    given-names: "Yusuf"
+    email: "yusufeminoglu@gmail.com"
+    orcid: "https://orcid.org/0009-0005-6000-2934"
+title: "NCZ2Geo"
+version: "0.13.0"
+date-released: "2026-10-26"
+license: "GPL-2.0-or-later"
+repository-code: "https://github.com/YusufEminoglu/NCZ2Geo"
+url: "https://pypi.org/project/NCZ2Geo/"
+abstract: "Read Netcad NCZ/NCA files in pure Python and convert them to GeoJSON, GeoPackage, Shapefile, FlatGeobuf, GeoParquet, DXF and KML/KMZ."
+keywords:
+  - "netcad"
+  - "ncz"
+  - "nca"
+  - "plangml"
+  - "eplan"
+  - "mpyy"
+  - "geojson"
+  - "gis"
+  - "ncz-to-geojson"
+  - "netcad-converter"
+  - "geopackage"
+  - "kml"
