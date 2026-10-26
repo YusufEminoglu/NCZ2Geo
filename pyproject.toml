@@ -67,11 +67,10 @@ ncz2geo = "ncz2geo.cli:main"
 
 [project.urls]
 Homepage = "https://geophilo.com/"
-Repository = "https://gitlab.com/geospacephilo/NCZ2Geo"
-GitHub = "https://github.com/YusufEminoglu/NCZ2Geo"
+Repository = "https://github.com/YusufEminoglu/NCZ2Geo"
 Issues = "https://github.com/YusufEminoglu/NCZ2Geo/issues"
 Documentation = "https://geophilo.com/NCZ2Geo/"
-Changelog = "https://gitlab.com/geospacephilo/NCZ2Geo/-/blob/main/CHANGELOG.md"
+Changelog = "https://github.com/YusufEminoglu/NCZ2Geo/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
