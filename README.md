@@ -10,15 +10,60 @@
 [![PyPI version](https://img.shields.io/pypi/v/NCZ2Geo.svg?color=3b82f6)](https://pypi.org/project/NCZ2Geo/)
 [![Python version support](https://img.shields.io/pypi/pyversions/NCZ2Geo.svg?color=10b981)](https://pypi.org/project/NCZ2Geo/)
 [![Documentation](https://img.shields.io/badge/docs-GEOPHILO-10b981.svg)](https://geophilo.com/NCZ2Geo/)
-[![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL--2.0--or--later-blue.svg)](LICENSE)
+[![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL--2.0--or--later-blue.svg)](https://github.com/YusufEminoglu/NCZ2Geo/blob/main/LICENSE)
 [![Code style: Ruff](https://img.shields.io/badge/code%20style-ruff-D7FF64.svg)](https://docs.astral.sh/ruff/)
-[![Test Coverage](https://img.shields.io/badge/coverage-84%25-brightgreen.svg)](#-development--testing)
+[![Test Coverage](https://img.shields.io/badge/coverage-92%25-brightgreen.svg)](#-development--testing)
 
-**Pure-Python Netcad NCZ/NCA Reader with PlanGML Identity and e-Plan Symbology Metadata.**
+**Read Netcad NCZ/NCA files in pure Python and export them to GeoJSON, GeoPackage and KML/KMZ, with PlanGML / e-Plan layer classification.**
 
-[📖 **Open Interactive Web Manual**](https://geophilo.com/NCZ2Geo/) • [📦 **PyPI Package**](https://pypi.org/project/NCZ2Geo/) • [🐛 **Issue Tracker**](https://gitlab.com/geospacephilo/NCZ2Geo/-/issues)
+[📖 **Open Interactive Web Manual**](https://geophilo.com/NCZ2Geo/) • [📦 **PyPI Package**](https://pypi.org/project/NCZ2Geo/) • [🐙 **GitHub**](https://github.com/YusufEminoglu/NCZ2Geo) • [🐛 **Issue Tracker**](https://github.com/YusufEminoglu/NCZ2Geo/issues)
 
 </div>
+
+---
+
+## 📦 Installation
+
+```bash
+pip install NCZ2Geo
+```
+
+Requires **Python 3.9 or newer**. There are no third-party runtime dependencies. Development tooling: `pip install -e ".[dev]"` (see *Development Install* below).
+
+## ⚡ Quickstart
+
+```python
+from ncz2geo import export_entities_to_geopackage, parse_netcad, write_geojson
+
+# Decode a Netcad drawing (no Netcad installation needed)
+result = parse_netcad("plan.ncz")
+print(len(result.entities), "entities in layers", result.layer_names)
+
+# GeoJSON enriched with PlanGML / e-Plan attributes
+collection = write_geojson(result.entities, "plan.geojson", plan_type="UIP")
+print(len(collection["features"]), "features -> plan.geojson")
+
+# Same entities as a GeoPackage
+gpkg = export_entities_to_geopackage(result.entities, "plan.gpkg")
+print(gpkg.total_features_written, "features -> plan.gpkg")
+
+# 15 entities in layers ['ROADS', 'PARCELS', 'TEXT', 'TRIANGLES', 'MISC']
+# 15 features -> plan.geojson
+# 15 features -> plan.gpkg
+```
+
+Same from the shell: `ncz2geo inspect plan.ncz` and `ncz2geo convert plan.ncz plan.geojson`.
+
+## 🇹🇷 Türkçe Özet
+
+**NCZ2Geo**, Netcad `.ncz` / `.nca` imar planı çizimlerini saf Python ile okur ve GeoJSON, GeoPackage ve KML/KMZ formatlarına dönüştürür. Netcad kurulumu gerekmez, ek bir kütüphane de istemez.
+Katman adlarını PlanGML / MPYY tabakalarıyla eşleştirir, e-Plan renklerini ekler ve planın mevzuata uygunluğunu raporlayabilir.
+
+```bash
+pip install NCZ2Geo
+```
+
+Ayrıntılı kullanım kılavuzu: [geophilo.com/NCZ2Geo](https://geophilo.com/NCZ2Geo/)
 
 ---
 
@@ -48,15 +93,7 @@ Built entirely on the high-speed **NCZ Engine v2** core, **NCZ2Geo** operates 10
 
 ---
 
-## 📦 Installation
-
-### From PyPI
-
-```bash
-pip install NCZ2Geo
-```
-
-Requires **Python 3.9 or newer**. There are no third-party runtime dependencies.
+## 🧰 Development Install & Troubleshooting
 
 ### Development install
 
@@ -100,7 +137,7 @@ ncz2geo --version
 
 ---
 
-## 🚀 Quickstart & Python API
+## 🚀 Python API Examples
 
 ### 1. Automatic Layer Classification
 
@@ -394,7 +431,7 @@ The package exports the following public names from `ncz2geo`. `ncz2geo.__versio
 
 | Operation | Dataset / File Size | Entities | NCZ2Geo Execution Time | Throughput |
 | :--- | :--- | :--- | :--- | :--- |
-| **Layer Catalog & PlanGML Resolution** | 50 MB NCZ Plan | 150,000 Entities | **3.8 ms** | $\mathcal{O}(1)$ Instant Pass |
+| **Layer Catalog & PlanGML Resolution** | 50 MB NCZ Plan | 150,000 Entities | **3.8 ms** | O(1) Instant Pass |
 | **Cached Catalog Query** | 50 MB NCZ Plan | 150,000 Entities | **0.1 ms** | Instant Local Cache |
 | **Selective Layer Decode & e-Plan Styling** | 50 MB NCZ Plan | 12,500 Entities | **42.1 ms** | 296,000 entities/sec |
 
@@ -433,7 +470,7 @@ If you use **NCZ2Geo** in urban planning studies, cadastral automation pipelines
   title     = {{NCZ2Geo: Pure-Python Netcad NCZ/NCA Reader with PlanGML Identity and e-Plan Symbology Metadata}},
   year      = {2026},
   publisher = {PyPI - Python Package Index},
-  version   = {0.12.1},
+  version   = {0.12.2},
   url       = {https://gitlab.com/geospacephilo/NCZ2Geo}
 }
 ```

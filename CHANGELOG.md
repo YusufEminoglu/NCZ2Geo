@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [0.12.2] - 2026-10-26
 ### Fixed
 - NCZ Engine v2 decoders no longer leak `NaN`/`inf` from corrupt or unexpected field values
   into decoded entities. A non-finite box rotation used to turn every ring corner into `NaN`
@@ -31,6 +33,9 @@ All notable changes to this project will be documented in this file.
   function names such as `TİCARET ALANI` and `PASİF YEŞİL ALAN` are classified as commercial
   and green (they fell through to the generic branch); office layers match `OFIS` (was the
   misspelt `OFIZ`).
+
+### Changed
+- PyPI metadata: a plain-language summary, search keywords that match what users look for, and a working issue tracker link (GitHub issues; the GitLab issues page returned 404).
 
 ## [0.12.1] - 2026-10-23
 ### Changed
