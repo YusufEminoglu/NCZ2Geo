@@ -108,7 +108,7 @@ Built entirely on the high-speed **NCZ Engine v2** core, **NCZ2Geo** operates 10
 Clone the repository and install the package in editable mode together with the `dev` extra (pytest, pytest-cov, ruff, mypy, build, and twine):
 
 ```bash
-git clone https://gitlab.com/geospacephilo/NCZ2Geo.git
+git clone https://github.com/YusufEminoglu/NCZ2Geo.git
 cd NCZ2Geo
 python -m pip install -e ".[dev]"
 ```
@@ -458,7 +458,7 @@ The package exports the following public names from `ncz2geo`. `ncz2geo.__versio
 
 ```bash
 # Clone the repository
-git clone https://gitlab.com/geospacephilo/NCZ2Geo.git
+git clone https://github.com/YusufEminoglu/NCZ2Geo.git
 cd NCZ2Geo
 
 # Install in editable mode with the dev extra
@@ -489,7 +489,7 @@ If you use **NCZ2Geo** in urban planning studies, cadastral automation pipelines
   publisher = {Zenodo},
   version   = {0.13.0},
   doi       = {10.5281/zenodo.23677241},
-  url       = {https://gitlab.com/geospacephilo/NCZ2Geo}
+  url       = {https://github.com/YusufEminoglu/NCZ2Geo}
 }
 ```
 
