@@ -20,6 +20,11 @@ from .binary import Cursor, finite_pair_in_range
 RAD_TO_DEG = 180.0 / math.pi
 
 
+def _finite(value: float, default: float = 0.0) -> float:
+    """Return *value* when finite, else *default* (keeps NaN/inf out of the output)."""
+    return value if math.isfinite(value) else default
+
+
 @dataclass(frozen=True)
 class GeometryRecord:
     """Context for one geometry record inside the file buffer."""
@@ -292,7 +297,7 @@ def decode_circle(record: GeometryRecord) -> dict | None:
     if not finite_pair_in_range(first, second):
         return None
     diameter = abs(cursor.f64(record.base + 50) - cursor.f64(record.base + 66))
-    return _entity(record, "Circle", [map_point(first, second, z)], radius=diameter / 2.0)
+    return _entity(record, "Circle", [map_point(first, second, z)], radius=_finite(diameter / 2.0))
 
 
 def decode_arc(record: GeometryRecord) -> dict | None:
@@ -306,9 +311,9 @@ def decode_arc(record: GeometryRecord) -> dict | None:
         record,
         "Arc",
         [map_point(first, second, z)],
-        radius=cursor.f64(shifted + 86),
-        start_angle=cursor.f64(shifted + 104),
-        end_angle=cursor.f64(shifted + 112),
+        radius=_finite(cursor.f64(shifted + 86)),
+        start_angle=_finite(cursor.f64(shifted + 104)),
+        end_angle=_finite(cursor.f64(shifted + 112)),
     )
 
 
@@ -349,7 +354,7 @@ def decode_text(record: GeometryRecord) -> dict | None:
         [map_point(first, second, _z_with_fallback(record))],
         label_text=text,
         text_height=height,
-        rotation_degrees=(cursor.f32(shifted + 90) * RAD_TO_DEG) % 360.0,
+        rotation_degrees=_finite(cursor.f32(shifted + 90) * RAD_TO_DEG) % 360.0,
     )
 
 
@@ -374,7 +379,7 @@ def decode_symbol(record: GeometryRecord) -> dict | None:
         [map_point(first, second, z)],
         label_text=f"S{cursor.u8(code_offset)}",
         text_height=size,
-        rotation_degrees=(cursor.f32(shifted + 90) * RAD_TO_DEG) % 360.0,
+        rotation_degrees=_finite(cursor.f32(shifted + 90) * RAD_TO_DEG) % 360.0,
     )
 
 
@@ -392,9 +397,10 @@ def decode_polyline(record: GeometryRecord) -> dict | None:
         vertex = shifted + 113 + index * 24
         if vertex + 24 > cursor.size:
             break
-        points.append(
-            map_point(cursor.f64(vertex), cursor.f64(vertex + 8), cursor.f64(vertex + 16))
-        )
+        first, second = cursor.f64(vertex), cursor.f64(vertex + 8)
+        if not (math.isfinite(first) and math.isfinite(second)):
+            continue
+        points.append(map_point(first, second, _finite(cursor.f64(vertex + 16))))
     if len(points) < 2:
         return None
 
@@ -472,7 +478,7 @@ def decode_box(record: GeometryRecord) -> dict | None:
         return None
     width = abs(first_b - first_a)
     height = abs(second_b - second_a)
-    rotation = (cursor.f32(shifted + 120) * RAD_TO_DEG) % 360.0
+    rotation = _finite(cursor.f32(shifted + 120) * RAD_TO_DEG) % 360.0
     return _entity(
         record,
         "Polygon",
@@ -603,7 +609,7 @@ def decode_block_reference(record: GeometryRecord) -> dict | None:
         "Block",
         [map_point(first, second, z)],
         label_text=_printable_prefixed_name(cursor, shifted + 86, record.end),
-        rotation_degrees=(cursor.f32(shifted + 118) * RAD_TO_DEG) % 360.0,
+        rotation_degrees=_finite(cursor.f32(shifted + 118) * RAD_TO_DEG) % 360.0,
     )
 
 
@@ -618,7 +624,7 @@ def decode_smart_object(record: GeometryRecord) -> dict | None:
     def bounded_f64(offset: int) -> float:
         """Read a float64 at *offset*, or 0.0 when it would exceed the buffer."""
         if record.base + offset + 8 <= cursor.size:
-            return cursor.f64(record.base + offset)
+            return _finite(cursor.f64(record.base + offset))
         return 0.0
 
     width = bounded_f64(169)

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed
+- NCZ Engine v2 decoders no longer leak `NaN`/`inf` from corrupt or unexpected field values
+  into decoded entities. A non-finite box rotation used to turn every ring corner into `NaN`
+  (written as invalid JSON by the GeoJSON exporters), and smart-object sizes, circle/arc
+  radii and angles, and text/symbol/block rotations could carry `NaN`/`Infinity`. Such
+  scalars now fall back to `0`, smart objects use their corner-point size, and polyline
+  vertices with non-finite coordinates are skipped.
+
 ## [0.12.1] - 2026-10-23
 ### Changed
 - Completed docstrings and type annotations across the public API and NCZ Engine v2 internals, with no runtime behavior changes.
