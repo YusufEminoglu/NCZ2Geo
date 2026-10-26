@@ -8,6 +8,7 @@
 
 
 [![PyPI version](https://img.shields.io/pypi/v/NCZ2Geo.svg?color=3b82f6)](https://pypi.org/project/NCZ2Geo/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23677241.svg)](https://doi.org/10.5281/zenodo.23677241)
 [![Python version support](https://img.shields.io/pypi/pyversions/NCZ2Geo.svg?color=10b981)](https://pypi.org/project/NCZ2Geo/)
 [![Documentation](https://img.shields.io/badge/docs-GEOPHILO-10b981.svg)](https://geophilo.com/NCZ2Geo/)
 [![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL--2.0--or--later-blue.svg)](https://github.com/YusufEminoglu/NCZ2Geo/blob/main/LICENSE)
@@ -485,8 +486,9 @@ If you use **NCZ2Geo** in urban planning studies, cadastral automation pipelines
   author    = {Emino{\u{g}}lu, Yusuf},
   title     = {{NCZ2Geo: Pure-Python Netcad NCZ/NCA Reader with PlanGML Identity and e-Plan Symbology Metadata}},
   year      = {2026},
-  publisher = {PyPI - Python Package Index},
+  publisher = {Zenodo},
   version   = {0.13.0},
+  doi       = {10.5281/zenodo.23677241},
   url       = {https://gitlab.com/geospacephilo/NCZ2Geo}
 }
 ```
