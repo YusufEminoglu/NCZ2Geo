@@ -487,7 +487,7 @@ If you use **NCZ2Geo** in urban planning studies, cadastral automation pipelines
   title     = {{NCZ2Geo: Pure-Python Netcad NCZ/NCA Reader with PlanGML Identity and e-Plan Symbology Metadata}},
   year      = {2026},
   publisher = {Zenodo},
-  version   = {0.13.0},
+  version   = {0.13.1},
   doi       = {10.5281/zenodo.23677241},
   url       = {https://github.com/YusufEminoglu/NCZ2Geo}
 }
